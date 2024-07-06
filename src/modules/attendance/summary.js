@@ -29,9 +29,9 @@ class Summary {
     getByDateandDepartment = async (date, departments_id) => {
         const CONNECTION = await SAT.getConnection();
         const QUERY = [
-            `SELECT LW.NAME, DATE_FORMAT(CI.DATE, '%Y-%m-%d') AS DATE, LW.${LIST_WORKER.COLUMN.SHIFT}, CI.TIME FROM list_worker AS LW 
-            JOIN company_departments AS CD ON LW.DEPARTMENT_ID = CD.ID 
-            LEFT JOIN worker_checkin AS CI ON LW.ID = CI.WORKER_ID AND CI.DATE = ? WHERE CD.ID = ?`
+            `SELECT LW.NAME, DATE_FORMAT(CI.DATE, '%Y-%m-%d') AS DATE, LW.${LIST_WORKER.COLUMN.SHIFT}, CI.TIME FROM ${LIST_WORKER.TABLE} AS LW 
+            JOIN ${COMPANY_DEPARTMENTS.TABLE} AS CD ON LW.DEPARTMENT_ID = CD.ID 
+            LEFT JOIN ${WORKER_CHECKIN.TABLE} AS CI ON LW.ID = CI.WORKER_ID AND CI.DATE = ? WHERE CD.ID = ?`
         ]
         const PARAMS = [[date, departments_id]]
 
