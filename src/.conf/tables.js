@@ -1,6 +1,6 @@
 const TABLES = {
     USER: {
-        TABLE: "USERS",
+        TABLE: "users",
         COLUMN: {
             ID: "ID",
             COMPANY_ID: "COMPANY_ID",
@@ -13,7 +13,7 @@ const TABLES = {
         }
     },
     COMPANY: {
-        TABLE: "COMPANY",
+        TABLE: "company",
         COLUMN: {
             ID: "ID",
             PASSWORD: "PASSWORD",
@@ -23,7 +23,7 @@ const TABLES = {
         }
     },
     COMPANY_DEPARTMENTS: {
-        TABLE: "COMPANY_DEPARTMENTS",
+        TABLE: "company_departments",
         COLUMN: {
             ID: "ID",
             COMPANY_ID: "COMPANY_ID",
@@ -32,7 +32,7 @@ const TABLES = {
         }
     },
     COMPANY_PROJECTS: {
-        TABLE: "COMPANY_PROJECTS",
+        TABLE: "company_projects",
         COLUMN: {
             ID: "ID",
             COMPANY_ID: "COMPANY_ID",
@@ -42,7 +42,7 @@ const TABLES = {
         }
     },
     LIST_WORKER: {
-        TABLE: "LIST_WORKER",
+        TABLE: "list_worker",
         COLUMN: {
             ID: "ID",
             DEPARTMENT_ID: "DEPARTMENT_ID",
@@ -54,7 +54,7 @@ const TABLES = {
         }
     },
     WORKER_CHECKIN: {
-        TABLE: "WORKER_CHECKIN",
+        TABLE: "worker_checkin",
         COLUMN: {
             ID: "ID",
             WORKER_ID: "WORKER_ID",
@@ -63,7 +63,7 @@ const TABLES = {
         }
     },
     WORKER_CHECKOUT: {
-        TABLE: "WORKER_CHECKOUT",
+        TABLE: "worker_checkout",
         COLUMN: {
             ID: "ID",
             WORKER_ID: "WORKER_ID",
