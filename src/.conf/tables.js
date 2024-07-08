@@ -60,6 +60,7 @@ const TABLES = {
             WORKER_ID: "WORKER_ID",
             DATE: "DATE",
             TIME: "TIME",
+            SHIFT: "SHIFT",
         }
     },
     WORKER_CHECKOUT: {
@@ -69,6 +70,7 @@ const TABLES = {
             WORKER_ID: "WORKER_ID",
             DATE: "DATE",
             TIME: "TIME",
+            SHIFT: "SHIFT",
         }
     }
 };

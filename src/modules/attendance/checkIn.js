@@ -7,10 +7,15 @@ class CheckIn {
         const QUERY = [
             `DELETE FROM ${TABLES.WORKER_CHECKIN.TABLE} WHERE ${TABLES.WORKER_CHECKIN.COLUMN.ID} IN 
             ( SELECT wc1.${TABLES.WORKER_CHECKIN.COLUMN.ID} FROM ${TABLES.WORKER_CHECKIN.TABLE} AS wc1 JOIN ${TABLES.WORKER_CHECKIN.TABLE} AS wc2 ON wc1.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID} = wc2.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID} 
-             AND wc1.${TABLES.WORKER_CHECKIN.COLUMN.DATE} = wc2.${TABLES.WORKER_CHECKIN.COLUMN.DATE} AND wc1.${TABLES.WORKER_CHECKIN.COLUMN.TIME} > wc2.${TABLES.WORKER_CHECKIN.COLUMN.TIME});`
+             AND wc1.${TABLES.WORKER_CHECKIN.COLUMN.DATE} = wc2.${TABLES.WORKER_CHECKIN.COLUMN.DATE} AND wc1.${TABLES.WORKER_CHECKIN.COLUMN.TIME} > wc2.${TABLES.WORKER_CHECKIN.COLUMN.TIME});`,
+            `DELETE t1 FROM ${TABLES.WORKER_CHECKIN.TABLE} t1 JOIN ${TABLES.WORKER_CHECKIN.TABLE} t2 ON t1.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID} = t2.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID} 
+            AND t1.${TABLES.WORKER_CHECKIN.COLUMN.DATE} = t2.${TABLES.WORKER_CHECKIN.COLUMN.DATE} AND t1.${TABLES.WORKER_CHECKIN.COLUMN.TIME} = t2.${TABLES.WORKER_CHECKIN.COLUMN.TIME} 
+            AND t1.${TABLES.WORKER_CHECKIN.COLUMN.ID} > t2.${TABLES.WORKER_CHECKIN.COLUMN.ID};`
         ]
         try {
-            await CONNECTION.query(QUERY[0])
+            for (let i = 0; i < QUERY.length; i++) {
+                await CONNECTION.query(QUERY[i])
+            }
         } catch (error) {
             throw error
         } finally {
@@ -62,7 +67,7 @@ class CheckIn {
         const CONNECTION = await SAT.getConnection();
         const LIMIT = parseInt(per_page);
         const OFFSET = page * LIMIT;
-        
+
         let QUERY;
         let PARAMS;
 
@@ -98,12 +103,13 @@ class CheckIn {
     uploadData = async (array_of_data) => {
         const CONNECTION = await SAT.getConnection()
         const QUERY = [
-            `INSERT INTO ${TABLES.WORKER_CHECKIN.TABLE} (${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID}, ${TABLES.WORKER_CHECKIN.COLUMN.DATE}, ${TABLES.WORKER_CHECKIN.COLUMN.TIME}) VALUES (?, ?, ?)`
+            `INSERT INTO ${TABLES.WORKER_CHECKIN.TABLE} (${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID}, ${TABLES.WORKER_CHECKIN.COLUMN.DATE}, ${TABLES.WORKER_CHECKIN.COLUMN.TIME}, ${TABLES.WORKER_CHECKIN.COLUMN.SHIFT}) 
+            VALUES (?, ?, ?, (SELECT CI.${TABLES.LIST_WORKER.COLUMN.SHIFT} FROM ${TABLES.LIST_WORKER.TABLE} AS CI WHERE CI.${TABLES.LIST_WORKER.COLUMN.ID} = ?))`
         ]
 
         try {
             for (let i = 0; i < array_of_data.length; i++) {
-                const PARAMS = [array_of_data[i]["WORKER_ID"], array_of_data[i]["DATE"], array_of_data[i]["TIME"]]
+                const PARAMS = [array_of_data[i]["WORKER_ID"], array_of_data[i]["DATE"], array_of_data[i]["TIME"], array_of_data[i]["WORKER_ID"]]
                 await CONNECTION.query(QUERY[0], PARAMS)
             }
 

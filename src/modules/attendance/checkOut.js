@@ -7,10 +7,15 @@ class CheckOut {
         const QUERY = [
             `DELETE FROM ${TABLES.WORKER_CHECKOUT.TABLE} WHERE ${TABLES.WORKER_CHECKOUT.COLUMN.ID} IN 
             ( SELECT wc1.${TABLES.WORKER_CHECKOUT.COLUMN.ID} FROM ${TABLES.WORKER_CHECKOUT.TABLE} AS wc1 JOIN ${TABLES.WORKER_CHECKOUT.TABLE} AS wc2 ON wc1.${TABLES.WORKER_CHECKOUT.COLUMN.WORKER_ID} = wc2.${TABLES.WORKER_CHECKOUT.COLUMN.WORKER_ID} 
-             AND wc1.${TABLES.WORKER_CHECKOUT.COLUMN.DATE} = wc2.${TABLES.WORKER_CHECKOUT.COLUMN.DATE} AND wc1.${TABLES.WORKER_CHECKOUT.COLUMN.TIME} < wc2.${TABLES.WORKER_CHECKOUT.COLUMN.TIME});`
+             AND wc1.${TABLES.WORKER_CHECKOUT.COLUMN.DATE} = wc2.${TABLES.WORKER_CHECKOUT.COLUMN.DATE} AND wc1.${TABLES.WORKER_CHECKOUT.COLUMN.TIME} < wc2.${TABLES.WORKER_CHECKOUT.COLUMN.TIME});`,
+            `DELETE t1 FROM ${TABLES.WORKER_CHECKOUT.TABLE} t1 JOIN ${TABLES.WORKER_CHECKOUT.TABLE} t2 ON t1.${TABLES.WORKER_CHECKOUT.COLUMN.WORKER_ID} = t2.${TABLES.WORKER_CHECKOUT.COLUMN.WORKER_ID} 
+            AND t1.${TABLES.WORKER_CHECKOUT.COLUMN.DATE} = t2.${TABLES.WORKER_CHECKOUT.COLUMN.DATE} AND t1.${TABLES.WORKER_CHECKOUT.COLUMN.TIME} = t2.${TABLES.WORKER_CHECKOUT.COLUMN.TIME} 
+            AND t1.${TABLES.WORKER_CHECKOUT.COLUMN.ID} > t2.${TABLES.WORKER_CHECKOUT.COLUMN.ID};`
         ]
         try {
-            await CONNECTION.query(QUERY[0])
+            for (let i = 0; i < QUERY.length; i++) {
+                await CONNECTION.query(QUERY[i])
+            }
         } catch (error) {
             throw error
         } finally {
@@ -30,7 +35,7 @@ class CheckOut {
         const PARAMS = [[project_id, date, LIMIT, OFFSET]]
 
         try {
-            const DATA = await CONNECTION.query(QUERY[0], PARAMS[0]) ;
+            const DATA = await CONNECTION.query(QUERY[0], PARAMS[0]);
             return DATA
         } catch (error) {
             throw error
@@ -43,7 +48,7 @@ class CheckOut {
         const CONNECTION = await SAT.getConnection();
         const LIMIT = parseInt(per_page);
         const OFFSET = page * LIMIT;
-        
+
         let QUERY;
         let PARAMS;
 
@@ -78,12 +83,13 @@ class CheckOut {
     uploadData = async (array_of_data) => {
         const CONNECTION = await SAT.getConnection()
         const QUERY = [
-            `INSERT INTO ${TABLES.WORKER_CHECKOUT.TABLE} (${TABLES.WORKER_CHECKOUT.COLUMN.WORKER_ID}, ${TABLES.WORKER_CHECKOUT.COLUMN.DATE}, ${TABLES.WORKER_CHECKOUT.COLUMN.TIME}) VALUES (?, ?, ?)`
+            `INSERT INTO ${TABLES.WORKER_CHECKOUT.TABLE} (${TABLES.WORKER_CHECKOUT.COLUMN.WORKER_ID}, ${TABLES.WORKER_CHECKOUT.COLUMN.DATE}, ${TABLES.WORKER_CHECKOUT.COLUMN.TIME}) 
+            VALUES (?, ?, ?, (SELECT CI.${TABLES.LIST_WORKER.COLUMN.SHIFT} FROM ${TABLES.LIST_WORKER.TABLE} AS CI WHERE CI.${TABLES.LIST_WORKER.COLUMN.ID} = ?))`
         ]
 
         try {
             for (let i = 0; i < array_of_data.length; i++) {
-                const PARAMS = [array_of_data[i]["WORKER_ID"], array_of_data[i]["DATE"], array_of_data[i]["TIME"]]
+                const PARAMS = [array_of_data[i]["WORKER_ID"], array_of_data[i]["DATE"], array_of_data[i]["TIME"], array_of_data[i]["WORKER_ID"]]
                 await CONNECTION.query(QUERY[0], PARAMS)
             }
 
