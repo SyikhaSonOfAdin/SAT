@@ -3,17 +3,21 @@ const TABLES = require("../../.conf/tables")
 
 class Worker {
 
-    add = async (name, department_id, project_id, input_by) => {
+    add = async (id, name, department_id, project_id, input_by) => {
         const CONNECTION = await SAT.getConnection()
         const QUERY_SELECT_LAST_ID = `SELECT MAX(${TABLES.LIST_WORKER.COLUMN.ID}) AS lastId FROM ${TABLES.LIST_WORKER.TABLE}`
         const QUERY_INSERT = `INSERT INTO ${TABLES.LIST_WORKER.TABLE} (${TABLES.LIST_WORKER.COLUMN.ID}, ${TABLES.LIST_WORKER.COLUMN.NAME}, ${TABLES.LIST_WORKER.COLUMN.DEPARTMENT_ID}, ${TABLES.LIST_WORKER.COLUMN.PROJECT_ID}, ${TABLES.LIST_WORKER.COLUMN.INPUT_BY}) VALUES (?, ?, ?, ?, ?)`
 
         try {
-            const [rows] = await CONNECTION.query(QUERY_SELECT_LAST_ID)
-            const lastId = rows[0].lastId || 0
-            const newId = lastId + 1
+            if (id == "null" || id == "" || id == null) {
+                const [rows] = await CONNECTION.query(QUERY_SELECT_LAST_ID)
+                const lastId = rows[0].lastId || 0
+                const newId = lastId + 1
 
-            await CONNECTION.query(QUERY_INSERT, [newId, name, department_id, project_id, input_by])
+                await CONNECTION.query(QUERY_INSERT, [newId, name, department_id, project_id, input_by])
+            } else {
+                await CONNECTION.query(QUERY_INSERT, [id, name, department_id, project_id, input_by])
+            }
         } catch (error) {
             throw error
         } finally {
@@ -47,6 +51,23 @@ class Worker {
 
         try {
             await CONNECTION.query(QUERY[0], PARAMS[0])
+        } catch (error) {
+            throw error
+        } finally {
+            CONNECTION.release()
+        }
+    }
+
+    getId = async (id) => {
+        const CONNECTION = await SAT.getConnection()
+        const QUERY = [
+            `SELECT EXISTS( SELECT 1 FROM ${TABLES.LIST_WORKER.TABLE} WHERE ${TABLES.LIST_WORKER.COLUMN.ID} = ? ) AS id_exists`
+        ]
+        const PARAMS = [[id]]
+
+        try {
+            const isExist = await CONNECTION.query(QUERY[0], PARAMS[0])
+            return isExist[0][0]["id_exists"]
         } catch (error) {
             throw error
         } finally {

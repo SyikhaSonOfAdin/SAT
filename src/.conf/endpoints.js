@@ -10,7 +10,8 @@ const ENDPOINTS = {
             BYCOMPANYID: '/departments/:company_id'
         },
         WORKER: {
-            BYPROJECTID: '/workers/:project_id/:company_id'
+            BYPROJECTID: '/workers/:project_id/:company_id',
+            GETID: '/workers/getid/:project_id/:company_id',
         }
     },
     POST: {

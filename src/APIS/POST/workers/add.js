@@ -11,18 +11,17 @@ const security = new Security()
 
 
 router.post(ENDPOINTS.POST.WORKER.ADD,  async (req, res) => {
-    const { name, department_id, project_id, input_by} = req.body
+    const { id, name, department_id, project_id, input_by } = req.body
 
     try {
-        await worker.add(name, department_id, project_id, input_by)
+        await worker.add(id, name, department_id, project_id, input_by)
         res.status(200).json({
             status: 'success',
         })
-    } catch (error) {        
-        console.log(error.message)
+    } catch (error) {
         res.status(200).json({
             status: 'failed',
-            info: error
+            info: error.message
         })
     }
 });

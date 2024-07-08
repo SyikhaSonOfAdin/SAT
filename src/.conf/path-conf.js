@@ -44,7 +44,8 @@ const PATH_CONF = {
             BYCOMPANYID: require('../APIS/GET/departments/byCompanyId')
         },
         WORKERS: {
-            BYPROJECTID: require('../APIS/GET/workers/getByProjectId')
+            BYPROJECTID: require('../APIS/GET/workers/getByProjectId'),
+            GETID: require('../APIS/GET/workers/getId'),
         }
     }
 }
@@ -79,6 +80,7 @@ const ARRAY_PATH = {
         PATH_CONF.GET.DEPARTMENTS.BYCOMPANYID,
 
         PATH_CONF.GET.WORKERS.BYPROJECTID,
+        PATH_CONF.GET.WORKERS.GETID,
     ]
 }
 module.exports = ARRAY_PATH;
