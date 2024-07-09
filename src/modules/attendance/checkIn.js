@@ -2,6 +2,24 @@ const SAT = require("../../.conf/db-conf")
 const TABLES = require("../../.conf/tables")
 
 class CheckIn {
+    add = async (worker_id, date, time) => {
+        const CONNECTION = await SAT.getConnection()
+        const QUERY = [
+            `INSERT INTO ${TABLES.WORKER_CHECKIN.TABLE} (${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID}, ${TABLES.WORKER_CHECKIN.COLUMN.DATE}, ${TABLES.WORKER_CHECKIN.COLUMN.TIME}, ${TABLES.WORKER_CHECKIN.COLUMN.SHIFT}) 
+            VALUES (?, ?, ?, COALESCE((SELECT CI.${TABLES.LIST_WORKER.COLUMN.SHIFT} FROM ${TABLES.LIST_WORKER.TABLE} AS CI WHERE CI.${TABLES.LIST_WORKER.COLUMN.ID} = ?), 0 ))`
+        ]
+        const PARAMS = [[worker_id, date, time, worker_id]]
+
+        try {
+            await CONNECTION.query(QUERY[0], PARAMS[0])            
+        } catch (error) {
+            throw error
+        } finally {
+            CONNECTION.release();
+        }
+    }
+
+    
     cleanUp = async () => {
         const CONNECTION = await SAT.getConnection()
         const QUERY = [

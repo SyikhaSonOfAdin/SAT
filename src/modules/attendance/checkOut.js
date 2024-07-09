@@ -2,6 +2,24 @@ const SAT = require("../../.conf/db-conf")
 const TABLES = require("../../.conf/tables")
 
 class CheckOut {
+    add = async (worker_id, date, time) => {
+        const CONNECTION = await SAT.getConnection()
+        const QUERY = [
+            `INSERT INTO ${TABLES.WORKER_CHECKOUT.TABLE} (${TABLES.WORKER_CHECKOUT.COLUMN.WORKER_ID}, ${TABLES.WORKER_CHECKOUT.COLUMN.DATE}, ${TABLES.WORKER_CHECKOUT.COLUMN.TIME}, ${TABLES.WORKER_CHECKOUT.COLUMN.SHIFT}) 
+            VALUES (?, ?, ?, COALESCE((SELECT CI.${TABLES.LIST_WORKER.COLUMN.SHIFT} FROM ${TABLES.LIST_WORKER.TABLE} AS CI WHERE CI.${TABLES.LIST_WORKER.COLUMN.ID} = ?), 0 ))`
+        ]
+        const PARAMS = [[worker_id, date, time, worker_id]]
+
+        try {
+            await CONNECTION.query(QUERY[0], PARAMS[0])
+        } catch (error) {
+            throw error
+        } finally {
+            CONNECTION.release();
+        }
+    }
+
+
     cleanUp = async () => {
         const CONNECTION = await SAT.getConnection()
         const QUERY = [
@@ -79,6 +97,26 @@ class CheckOut {
             CONNECTION.release();
         }
     };
+
+    isNightShift = async (worker_id) => {
+        const CONNECTION = await SAT.getConnection();
+        const QUERY = `SELECT SHIFT FROM ${TABLES.LIST_WORKER.TABLE} WHERE ${TABLES.LIST_WORKER.COLUMN.ID} = ?`;
+        const PARAMS = [worker_id];
+
+        try {
+            const [rows] = await CONNECTION.query(QUERY, PARAMS);
+            if (rows.length > 0) {
+                return rows[0].SHIFT == 1;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            throw error;
+        } finally {
+            CONNECTION.release();
+        }
+    };
+
 
     uploadData = async (array_of_data) => {
         const CONNECTION = await SAT.getConnection()
