@@ -37,7 +37,7 @@ class Summary {
         const CONNECTION = await SAT.getConnection();
         const QUERY = `
             SELECT LW.${TABLES.LIST_WORKER.COLUMN.NAME}, COALESCE(DATE_FORMAT(CI.${TABLES.WORKER_CHECKIN.COLUMN.DATE}, '%Y-%m-%d'), DATE_FORMAT(CO.${TABLES.WORKER_CHECKOUT.COLUMN.DATE}, '%Y-%m-%d')) AS DATE,
-                   CO.${TABLES.WORKER_CHECKOUT.COLUMN.SHIFT}, 
+                   COALESCE(CO.${TABLES.WORKER_CHECKOUT.COLUMN.SHIFT}, CI.${TABLES.WORKER_CHECKIN.COLUMN.SHIFT}) AS SHIFT, 
                    CI.${TABLES.WORKER_CHECKIN.COLUMN.TIME} AS CHECKIN, 
                    CO.${TABLES.WORKER_CHECKOUT.COLUMN.TIME} AS CHECKOUT 
             FROM ${TABLES.LIST_WORKER.TABLE} AS LW 
@@ -52,7 +52,7 @@ class Summary {
             WHERE CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.ID} = ?
         `;
 
-        const PARAMS = [date, date, departments_id]; // Parameter yang dibutuhkan dalam query
+        const PARAMS = [date, date, departments_id]; 
 
         try {
             const DATA = await CONNECTION.query(QUERY, PARAMS);
@@ -61,6 +61,29 @@ class Summary {
             throw error;
         } finally {
             CONNECTION.release();
+        }
+    }
+
+    getByDepartmentId = async (department_id) => {
+        const CONNECTION = await SAT.getConnection()
+        const QUERY = [
+            `WITH RECURSIVE DateRange AS ( SELECT '2024-06-01' AS DATE UNION ALL SELECT DATE_ADD(DATE, INTERVAL 1 DAY) FROM DateRange WHERE DATE < '2024-07-01')
+            SELECT lw.ID AS WORKER_ID, lw.NAME AS NAME, COALESCE(ci.TIME, '-') AS TIME, dr.DATE AS DATE FROM list_worker AS lw 
+            JOIN company_departments AS cd ON lw.DEPARTMENT_ID = cd.ID 
+            JOIN DateRange AS dr
+            LEFT JOIN worker_checkin AS ci ON lw.ID = ci.WORKER_ID AND ci.DATE = dr.DATE 
+            WHERE cd.ID = ?
+            ORDER BY lw.ID, dr.DATE;`
+        ]
+        const PARAMS = [[department_id]]
+
+        try {
+            const DATA = await CONNECTION.query(QUERY[0], PARAMS[0])
+            return DATA
+        } catch (error) {
+            throw error
+        } finally {
+            CONNECTION.release()
         }
     }
 

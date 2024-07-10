@@ -39,6 +39,7 @@ const PATH_CONF = {
         SUMMARY: {
             BYDATE: require('../APIS/GET/summary/getByDate'),
             BYDATEDEPARTMENT: require('../APIS/GET/summary/getByDateandDepartment'),
+            BYDEPARTMENT: require('../APIS/GET/summary/getByDepartment'),
         },
         DEPARTMENTS: {
             BYCOMPANYID: require('../APIS/GET/departments/byCompanyId')
@@ -76,6 +77,7 @@ const ARRAY_PATH = {
 
         PATH_CONF.GET.SUMMARY.BYDATE,
         PATH_CONF.GET.SUMMARY.BYDATEDEPARTMENT,
+        PATH_CONF.GET.SUMMARY.BYDEPARTMENT,
 
         PATH_CONF.GET.DEPARTMENTS.BYCOMPANYID,
 

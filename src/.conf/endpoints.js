@@ -5,9 +5,10 @@ const ENDPOINTS = {
         SUMMARY: {
             BYDATE: '/summary/bydate/:user_id/:project_id',
             BYDATE_DEPARTMENT: '/summary/bydatedepartment/:user_id/:project_id',
+            DEPARTMENT: '/summary/department/:department_id/:company_id',
         },
         DEPARTMENTS: {
-            BYCOMPANYID: '/departments/:company_id'
+            BYCOMPANYID: '/departments/:company_id',
         },
         WORKER: {
             BYPROJECTID: '/workers/:project_id/:company_id',
