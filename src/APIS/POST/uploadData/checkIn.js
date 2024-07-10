@@ -34,7 +34,7 @@ router.post(ENDPOINTS.POST.CHECKIN.UPLOAD, storage.excel.single('file'), async (
             if (seconds2 < seconds) {
                 await checkOut.isNightShift(DATA[i]["WORKER_ID"]) ? await checkOut.add(DATA[i]["WORKER_ID"], DATA[i]["DATE"], DATA[i]["TIME"]) : await checkIn.add(DATA[i]["WORKER_ID"], DATA[i]["DATE"], DATA[i]["TIME"])
             } else {
-                await checkOut.add(DATA[i]["WORKER_ID"], DATA[i]["DATE"], DATA[i]["TIME"])
+                await checkOut.isNightShift(DATA[i]["WORKER_ID"]) ? await checkIn.add(DATA[i]["WORKER_ID"], DATA[i]["DATE"], DATA[i]["TIME"]) : await checkOut.add(DATA[i]["WORKER_ID"], DATA[i]["DATE"], DATA[i]["TIME"])
             }
         }
         await checkIn.cleanUp()
