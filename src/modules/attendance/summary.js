@@ -7,20 +7,19 @@ class Summary {
     getSummary = async (date) => {
         const CONNECTION = await SAT.getConnection();
         const QUERY = `
-            SELECT d.ID, d.NAME AS DEPARTMENTS, COALESCE(h.Presen, 0) AS PRESENT, COALESCE(a.Absent, 0) AS ABSENT, t.Total AS TOTAL, COALESCE(n.Night_Shift, 0) AS NIGHT_SHIFT 
-            FROM (SELECT lw.DEPARTMENT_ID, COUNT(lw.ID) AS Total FROM ${LIST_WORKER.TABLE} lw GROUP BY lw.DEPARTMENT_ID) t 
-            LEFT JOIN (SELECT lw.DEPARTMENT_ID, COUNT(wc.ID) AS Presen FROM ${LIST_WORKER.TABLE} lw 
-            LEFT JOIN ${WORKER_CHECKIN.TABLE} wc ON lw.ID = wc.WORKER_ID WHERE wc.DATE = ? 
-            GROUP BY lw.DEPARTMENT_ID) h ON t.DEPARTMENT_ID = h.DEPARTMENT_ID 
-            LEFT JOIN (SELECT lw.DEPARTMENT_ID, COUNT(lw.ID) - COUNT(wc.ID) AS Absent FROM ${LIST_WORKER.TABLE} lw 
-            LEFT JOIN ${WORKER_CHECKIN.TABLE} wc ON lw.ID = wc.WORKER_ID AND wc.DATE = ? 
-            GROUP BY lw.DEPARTMENT_ID) a ON t.DEPARTMENT_ID = a.DEPARTMENT_ID 
-            LEFT JOIN (SELECT lw.DEPARTMENT_ID, COUNT(wc.ID) AS Night_Shift FROM ${LIST_WORKER.TABLE} lw 
-            LEFT JOIN ${TABLES.WORKER_CHECKOUT.TABLE} wc ON lw.ID = wc.WORKER_ID WHERE wc.DATE = ? AND wc.SHIFT = 1 
-            GROUP BY lw.DEPARTMENT_ID) n ON t.DEPARTMENT_ID = n.DEPARTMENT_ID LEFT JOIN ${COMPANY_DEPARTMENTS.TABLE} d  ON t.DEPARTMENT_ID = d.ID  ORDER BY DEPARTMENTS;
+            SELECT cd.ID, cd.NAME AS DEPARTMENTS,        
+        COALESCE(SUM(CASE WHEN ci.DATE = ? AND ci.SHIFT = 0 THEN 1 ELSE 0 END), 0) AS PRESENT    , 
+        COALESCE(SUM(CASE WHEN ci.DATE IS NULL AND co.DATE IS NULL THEN 1 ELSE 0 END), 0) AS ABSENT,
+        COALESCE(SUM(CASE WHEN (ci.DATE = ? AND ci.SHIFT = 1) OR (co.DATE = ? AND co.SHIFT = 1) THEN 1 ELSE 0 END), 0) AS NIGHT_SHIFT,
+        COUNT(lw.ID) AS TOTAL       
+        FROM list_worker AS lw 
+        JOIN company_departments AS cd ON lw.DEPARTMENT_ID = cd.ID 
+        LEFT JOIN worker_checkin AS ci ON lw.ID = ci.WORKER_ID AND ci.DATE = ?
+        LEFT JOIN worker_checkout AS co ON lw.ID = co.WORKER_ID AND co.DATE = ?
+        GROUP BY cd.ID, cd.NAME;
         `;
 
-        const PARAMS = [date, date, date];
+        const PARAMS = [date, date, date, date, date];
 
         try {
             const DATA = await CONNECTION.query(QUERY, PARAMS);
