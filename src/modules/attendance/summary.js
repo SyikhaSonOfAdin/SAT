@@ -16,7 +16,7 @@ class Summary {
         JOIN company_departments AS cd ON lw.DEPARTMENT_ID = cd.ID 
         LEFT JOIN worker_checkin AS ci ON lw.ID = ci.WORKER_ID AND ci.DATE = ?
         LEFT JOIN worker_checkout AS co ON lw.ID = co.WORKER_ID AND co.DATE = ?
-        GROUP BY cd.ID, cd.NAME;
+        GROUP BY cd.ID, cd.NAME ORDER BY cd.NAME;
         `;
 
         const PARAMS = [date, date, date, date, date];
