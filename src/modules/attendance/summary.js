@@ -1,6 +1,5 @@
 const SAT = require("../../.conf/db-conf");
 const TABLES = require("../../.conf/tables");
-const { COMPANY_DEPARTMENTS, LIST_WORKER, WORKER_CHECKIN } = require("../../.conf/tables");
 
 class Summary {
 
@@ -63,10 +62,10 @@ class Summary {
         }
     }
 
-    getByDepartmentId = async (department_id) => {
+    getByDepartmentId = async (department_id, startDate, endDate) => {
         const CONNECTION = await SAT.getConnection()
         const QUERY = [
-            `WITH RECURSIVE DateRange AS ( SELECT '2024-06-01' AS DATE UNION ALL SELECT DATE_ADD(DATE, INTERVAL 1 DAY) FROM DateRange WHERE DATE < '2024-07-01')
+            `WITH RECURSIVE DateRange AS ( SELECT ? AS DATE UNION ALL SELECT DATE_ADD(DATE, INTERVAL 1 DAY) FROM DateRange WHERE DATE < ?)
             SELECT lw.ID AS WORKER_ID, lw.NAME AS NAME, COALESCE(ci.TIME, '-') AS TIME, dr.DATE AS DATE FROM list_worker AS lw 
             JOIN company_departments AS cd ON lw.DEPARTMENT_ID = cd.ID 
             JOIN DateRange AS dr
@@ -74,7 +73,7 @@ class Summary {
             WHERE cd.ID = ?
             ORDER BY lw.ID, dr.DATE;`
         ]
-        const PARAMS = [[department_id]]
+        const PARAMS = [[startDate, endDate,department_id]]
 
         try {
             const DATA = await CONNECTION.query(QUERY[0], PARAMS[0])
