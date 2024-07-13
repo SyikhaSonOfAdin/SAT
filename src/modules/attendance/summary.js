@@ -85,6 +85,80 @@ class Summary {
         }
     }
 
+    getNumberDepartments = async (company_id) => {
+        const CONNECTION = await SAT.getConnection()
+        const QUERY = [
+            `SELECT COUNT(CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.ID}) AS NUMBER_OF_DEPARTMENTS FROM ${TABLES.COMPANY_DEPARTMENTS.TABLE} AS CD WHERE CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.COMPANY_ID} = ?`
+        ]
+        const PARAMS = [[company_id]]
+
+        try {
+            const DATA = await CONNECTION.query(QUERY[0], PARAMS[0])
+            return DATA
+        } catch (error) {
+            throw error
+        } finally {
+            CONNECTION.release()
+        }
+    }
+
+    getNumberWorkers = async (project_id) => {
+        const CONNECTION = await SAT.getConnection()
+        const QUERY = [
+            `SELECT COUNT(LW.${TABLES.LIST_WORKER.COLUMN.ID}) AS NUMBER_OF_WORKERS FROM ${TABLES.LIST_WORKER.TABLE} AS LW WHERE LW.${TABLES.LIST_WORKER.COLUMN.PROJECT_ID} = ?`
+        ]
+        const PARAMS = [[project_id]]
+
+        try {
+            const DATA = await CONNECTION.query(QUERY[0], PARAMS[0])
+            return DATA
+        } catch (error) {
+            throw error
+        } finally {
+            CONNECTION.release()
+        }
+    }
+
+    getUnregisteredWorkers = async () => {
+        const CONNECTION = await SAT.getConnection()
+        const QUERY = [
+            `SELECT DISTINCT wc.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID} FROM ${TABLES.WORKER_CHECKIN.TABLE} AS wc 
+            LEFT JOIN ${TABLES.LIST_WORKER.TABLE} AS lw ON wc.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID} = lw.${TABLES.LIST_WORKER.COLUMN.ID} 
+            WHERE lw.${TABLES.LIST_WORKER.COLUMN.ID} IS NULL
+            ORDER BY wc.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID};`
+        ]
+        // const PARAMS = [[project_id]]
+
+        try {
+            const DATA = await CONNECTION.query(QUERY[0])
+            return DATA
+        } catch (error) {
+            throw error
+        } finally {
+            CONNECTION.release()
+        }
+    }
+
+    getNumberUnregisteredWorkers = async () => {
+        const CONNECTION = await SAT.getConnection()
+        const QUERY = [
+            `SELECT COUNT(DISTINCT wc.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID}) AS UNREGISTERED_WORKERS FROM ${TABLES.WORKER_CHECKIN.TABLE} AS wc 
+            LEFT JOIN ${TABLES.LIST_WORKER.TABLE} AS lw ON wc.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID} = lw.${TABLES.LIST_WORKER.COLUMN.ID} 
+            WHERE lw.${TABLES.LIST_WORKER.COLUMN.ID} IS NULL
+            ORDER BY wc.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID};`
+        ]
+        // const PARAMS = [[project_id]]
+
+        try {
+            const DATA = await CONNECTION.query(QUERY[0])
+            return DATA
+        } catch (error) {
+            throw error
+        } finally {
+            CONNECTION.release()
+        }
+    }
+
 }
 
 module.exports = Summary

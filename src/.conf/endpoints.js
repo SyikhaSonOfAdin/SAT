@@ -6,6 +6,7 @@ const ENDPOINTS = {
             BYDATE: '/summary/bydate/:user_id/:project_id',
             BYDATE_DEPARTMENT: '/summary/bydatedepartment/:user_id/:project_id',
             DEPARTMENT: '/summary/department/:department_id/:company_id',
+            NUMBER_OF: '/summary/dashboard/numbers/:company_id/:project_id',            
         },
         DEPARTMENTS: {
             BYCOMPANYID: '/departments/:company_id',
@@ -13,6 +14,7 @@ const ENDPOINTS = {
         WORKER: {
             BYPROJECTID: '/workers/:project_id/:company_id',
             GETID: '/workers/getid/:project_id/:company_id',
+            UNREGISTERED_WORKERS: '/workers/getunregisteredworkers/:project_id/:company_id',
         }
     },
     POST: {

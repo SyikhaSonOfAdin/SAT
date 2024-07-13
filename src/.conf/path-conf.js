@@ -40,6 +40,7 @@ const PATH_CONF = {
             BYDATE: require('../APIS/GET/summary/getByDate'),
             BYDATEDEPARTMENT: require('../APIS/GET/summary/getByDateandDepartment'),
             BYDEPARTMENT: require('../APIS/GET/summary/getByDepartment'),
+            NUMBER_OF: require('../APIS/GET/summary/getNumberOf'),
         },
         DEPARTMENTS: {
             BYCOMPANYID: require('../APIS/GET/departments/byCompanyId')
@@ -47,6 +48,7 @@ const PATH_CONF = {
         WORKERS: {
             BYPROJECTID: require('../APIS/GET/workers/getByProjectId'),
             GETID: require('../APIS/GET/workers/getId'),
+            UNREGISTERED_WORKERS: require('../APIS/GET/workers/getUnregisteredWorkers'),
         }
     }
 }
@@ -78,11 +80,13 @@ const ARRAY_PATH = {
         PATH_CONF.GET.SUMMARY.BYDATE,
         PATH_CONF.GET.SUMMARY.BYDATEDEPARTMENT,
         PATH_CONF.GET.SUMMARY.BYDEPARTMENT,
+        PATH_CONF.GET.SUMMARY.NUMBER_OF,
 
         PATH_CONF.GET.DEPARTMENTS.BYCOMPANYID,
 
         PATH_CONF.GET.WORKERS.BYPROJECTID,
         PATH_CONF.GET.WORKERS.GETID,
+        PATH_CONF.GET.WORKERS.UNREGISTERED_WORKERS,
     ]
 }
 module.exports = ARRAY_PATH;
