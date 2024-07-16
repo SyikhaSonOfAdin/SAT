@@ -9,12 +9,9 @@ const PATH_CONF = {
         USERS: {
             LOGIN: require('../APIS/POST/users/login'),
             ADD: require('../APIS/POST/users/add'),
-        },        
-        CHECKIN: {
-            UPLOAD: require('../APIS/POST/uploadData/checkIn')
-        },
-        CHECKOUT: {
-            UPLOAD: require('../APIS/POST/uploadData/checkOut')
+        },      
+        ONE_GATE: {
+            UPLOAD: require('../APIS/POST/uploadData/oneGate')
         },
         WORKER: {
             ADD: require('../APIS/POST/workers/add'),
@@ -61,8 +58,7 @@ const ARRAY_PATH = {
         PATH_CONF.POST.USERS.LOGIN,
         PATH_CONF.POST.USERS.ADD,
 
-        PATH_CONF.POST.CHECKIN.UPLOAD,
-        PATH_CONF.POST.CHECKOUT.UPLOAD,
+        PATH_CONF.POST.ONE_GATE.UPLOAD,
 
         PATH_CONF.POST.WORKER.DELETE,
         PATH_CONF.POST.WORKER.EDIT,

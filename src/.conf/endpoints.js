@@ -40,6 +40,9 @@ const ENDPOINTS = {
         CHECKOUT: {
             UPLOAD: '/checkout/upload',
         },
+        ONE_GATE: {
+            UPLOAD: '/upload/file/dat'
+        },
         WORKER: {
             UPLOAD: '/worker/upload',
             DELETE: '/worker/delete',
