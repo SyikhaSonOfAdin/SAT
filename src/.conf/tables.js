@@ -31,6 +31,16 @@ const TABLES = {
             NAME: "NAME",
         }
     },
+    LIST_SUB_DEPARTMENT: { // v1.4.0
+        TABLE: "list_sub_department",
+        COLUMN: {
+            ID: "ID",
+            DEPARTMENT_ID: "DEPARTMENT_ID",
+            INPUT_BY: "INPUT_BY",
+            INPUT_DATE: "INPUT_DATE",
+            NAME: "NAME",
+        }
+    },
     COMPANY_PROJECTS: {
         TABLE: "company_projects",
         COLUMN: {
@@ -46,9 +56,11 @@ const TABLES = {
         COLUMN: {
             ID: "ID",
             DEPARTMENT_ID: "DEPARTMENT_ID",
+            SUB_DEPARTMENT_ID: "SUB_DEPARTMENT_ID",  // v1.4.0
             PROJECT_ID: "PROJECT_ID",
             INPUT_BY: "INPUT_BY",
             INPUT_DATE: "INPUT_DATE",
+            WORKER_ID: "WORKER_ID",  // v1.4.0
             NAME: "NAME",
             SHIFT: "SHIFT",
         }

@@ -1,18 +1,16 @@
+const SubDepartment = require("../../../modules/departments/subDepartment");
 const ENDPOINTS = require("../../../.conf/endpoints");
-const Departments = require("../../../modules/departments/departments");
-const Project = require("../../../modules/project/project");
 const express = require('express');
-const Worker = require("../../../modules/worker/worker");
 const router = express.Router();
 
-const worker = new Worker();
+const subDepartment = new SubDepartment();
 
 
-router.post(ENDPOINTS.POST.WORKER.DELETE,  async (req, res) => {
-    const { worker_id } = req.body
+router.post(ENDPOINTS.POST.SUB_DEPARTMENTS.DELETE,  async (req, res) => {
+    const { subDepartment_id } = req.body
 
     try {
-        await worker.delete(worker_id)
+        await subDepartment.delete(subDepartment_id)
         res.status(200).json({
             status: 'success',
         })

@@ -3,6 +3,9 @@ const SNC = require('../.conf/db-conf');
 const TABLES = require('../.conf/tables');
 
 class Security {
+    #ENCRYPTION_KEY = crypto.randomBytes(32);
+    #IV_LENGTH = 16;
+
     getID = () => {
         return crypto.randomBytes(16).toString('hex');
     }
@@ -70,6 +73,24 @@ class Security {
             CONNECTION.release()
         }
     }
-}
 
-module.exports = Security
+    encrypt = (value) => {
+        const iv = crypto.randomBytes(this.#IV_LENGTH);
+        const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(this.#ENCRYPTION_KEY), iv);
+        let encrypted = cipher.update(value);
+        encrypted = Buffer.concat([encrypted, cipher.final()]);
+        return iv.toString('hex') + ':' + encrypted.toString('hex');
+    }
+
+    decrypt = (value) => {
+        const textParts = value.split(':');
+        const iv = Buffer.from(textParts.shift(), 'hex');
+        const encryptedText = Buffer.from(textParts.join(':'), 'hex');
+        const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(this.#ENCRYPTION_KEY), iv);
+        let decrypted = decipher.update(encryptedText);
+        decrypted = Buffer.concat([decrypted, decipher.final()]);
+        return decrypted.toString();
+      }
+}
+const security = new Security();
+module.exports = security

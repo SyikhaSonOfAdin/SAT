@@ -1,5 +1,4 @@
 const ENDPOINTS = require("../../../.conf/endpoints");
-const Security = require("../../../middleware/security");
 const Departments = require("../../../modules/departments/departments");
 const Project = require("../../../modules/project/project");
 const express = require('express');
@@ -7,7 +6,6 @@ const Worker = require("../../../modules/worker/worker");
 const router = express.Router();
 
 const worker = new Worker();
-const security = new Security()
 
 
 router.post(ENDPOINTS.POST.WORKER.EDIT,  async (req, res) => {

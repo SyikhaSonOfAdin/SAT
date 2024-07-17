@@ -1,12 +1,10 @@
 const ENDPOINTS = require("../../../.conf/endpoints");
-const Security = require("../../../middleware/security");
 const Departments = require("../../../modules/departments/departments");
 const Project = require("../../../modules/project/project");
 const express = require('express');
 const router = express.Router();
 
 const departments = new Departments();
-const security = new Security()
 
 
 router.post(ENDPOINTS.POST.DEPARTMENTS.DELETE,  async (req, res) => {

@@ -17,7 +17,7 @@ router.post(ENDPOINTS.POST.USERS.LOGIN, async (req, res) => {
     } catch (error) {
         res.status(200).json({
             success: false,
-            info: error
+            info: error.message
         })
     }
 })

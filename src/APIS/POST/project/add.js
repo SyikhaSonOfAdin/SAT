@@ -1,11 +1,8 @@
 const ENDPOINTS = require("../../../.conf/endpoints");
+const security = require("../../../middleware/security");
 const Security = require("../../../middleware/security");
-const Project = require("../../../modules/project/project");
 const express = require('express');
 const router = express.Router();
-
-const project = new Project();
-const security = new Security()
 
 
 router.post(ENDPOINTS.POST.PROJECT.ADD, security.checkPassId, async (req, res) => {

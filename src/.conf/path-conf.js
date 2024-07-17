@@ -11,7 +11,10 @@ const PATH_CONF = {
             ADD: require('../APIS/POST/users/add'),
         },      
         ONE_GATE: {
-            UPLOAD: require('../APIS/POST/uploadData/oneGate')
+            UPLOAD: {
+                DAT: require('../APIS/POST/uploadData/oneGateDat'),
+                EXCEL: require('../APIS/POST/uploadData/oneGateExcel'),
+            }
         },
         WORKER: {
             ADD: require('../APIS/POST/workers/add'),
@@ -24,6 +27,10 @@ const PATH_CONF = {
         DEPARTMENTS: {
             ADD: require('../APIS/POST/departments/addDepartments'),
             DELETE: require('../APIS/POST/departments/delete'),
+        },
+        SUB_DEPARTMENTS: {
+            ADD: require('../APIS/POST/subDepartment/add'),
+            DELETE: require('../APIS/POST/subDepartment/delete'),
         }
     },
     GET: {
@@ -58,7 +65,8 @@ const ARRAY_PATH = {
         PATH_CONF.POST.USERS.LOGIN,
         PATH_CONF.POST.USERS.ADD,
 
-        PATH_CONF.POST.ONE_GATE.UPLOAD,
+        PATH_CONF.POST.ONE_GATE.UPLOAD.DAT,
+        PATH_CONF.POST.ONE_GATE.UPLOAD.EXCEL,
 
         PATH_CONF.POST.WORKER.DELETE,
         PATH_CONF.POST.WORKER.EDIT,
@@ -68,6 +76,9 @@ const ARRAY_PATH = {
 
         PATH_CONF.POST.DEPARTMENTS.ADD,
         PATH_CONF.POST.DEPARTMENTS.DELETE,
+
+        PATH_CONF.POST.SUB_DEPARTMENTS.ADD,
+        PATH_CONF.POST.SUB_DEPARTMENTS.DELETE,
     ],
     GET: [
         PATH_CONF.GET.CHECKIN.BYDATE,

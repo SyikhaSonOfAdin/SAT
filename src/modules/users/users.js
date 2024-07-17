@@ -1,9 +1,8 @@
 const TABLES = require('../../.conf/tables');
 const SAT = require('../../.conf/db-conf');
-const Security = require('../../middleware/security');
+const security = require('../../middleware/security');
 
 class Users {
-    #security = new Security();
 
     authentication = async (Email, Password) => {
         const CONNECTION = await SAT.getConnection();
@@ -21,14 +20,14 @@ class Users {
             if (isExist[0].length > 0) {
                 return {
                     authentication: true,
-                    id: isExist[0][0]["ID"],
-                    email: isExist[0][0]["EMAIL"],
-                    password: isExist[0][0]["PASSWORD"],
+                    id: security.encrypt(isExist[0][0]["ID"].toString()),
+                    email: security.encrypt(isExist[0][0]["EMAIL"]),
+                    password: security.encrypt(isExist[0][0]["PASSWORD"]),
                     username: isExist[0][0]["USERNAME"],
-                    level: isExist[0][0]["LEVEL"], 
-                    company_id: isExist[0][0]["COMPANY_ID"],
+                    level: security.encrypt(isExist[0][0]["LEVEL"].toString()),
+                    company_id: security.encrypt(isExist[0][0]["COMPANY_ID"].toString()),
                     company_name: isExist[0][0]["COMPANY_NAME"],
-                    project_id: isExist[0][0]["PROJECT_ID"],
+                    project_id: security.encrypt(isExist[0][0]["PROJECT_ID"].toString()),
                     project_name: isExist[0][0]["PROJECT_NAME"],
                 }
             } else {

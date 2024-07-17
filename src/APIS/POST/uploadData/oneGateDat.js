@@ -1,19 +1,17 @@
-const Security = require('../../../middleware/security');
 const ENDPOINTS = require('../../../.conf/endpoints');
 const Storage = require('../../../.conf/multer-conf');
-const Excel = require('../../../modules/excel/excel');
 const express = require('express');
 const CheckIn = require('../../../modules/attendance/checkIn');
 const CheckOut = require('../../../modules/attendance/checkOut');
+const Dat = require('../../../modules/dat/dat');
 
-const security = new Security()
 const router = express.Router()
 const storage = new Storage()
-const excel = new Excel()
+const dat = new Dat()
 const checkIn = new CheckIn()
 const checkOut = new CheckOut()
 
-router.post(ENDPOINTS.POST.CHECKIN.UPLOAD, storage.excel.single('file'), async (req, res) => {
+router.post(ENDPOINTS.POST.ONE_GATE.UPLOAD.DAT, storage.dat.single('file'), async (req, res) => {
 
     if (!req.file) {
         return res.status(400).json({
@@ -23,8 +21,7 @@ router.post(ENDPOINTS.POST.CHECKIN.UPLOAD, storage.excel.single('file'), async (
     }
 
     try {
-        const RAW = await excel.getData(`${storage.nameFile}`);
-        const DATA = excel.attendenceData(RAW);
+        const DATA = await dat.getData(storage.nameFile)
         const time = "15:00:00"
         var array = time.split(":");
         var seconds = (parseInt(array[0], 10) * 60 * 60) + (parseInt(array[1], 10) * 60) + parseInt(array[2], 10)

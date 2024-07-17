@@ -33,15 +33,12 @@ const ENDPOINTS = {
             ADD: '/users/add/:company_id/:pass_id',
             EDIT: '/users/edit/:company_id/:pass_id',
             DELETE: '/users/delete/:company_id/:pass_id',
-        },              
-        CHECKIN: {
-            UPLOAD: '/checkin/upload',
-        },
-        CHECKOUT: {
-            UPLOAD: '/checkout/upload',
-        },
+        },                     
         ONE_GATE: {
-            UPLOAD: '/upload/file/dat'
+            UPLOAD: {
+                DAT: '/upload/file/dat',
+                EXCEL: '/upload/file/excel',
+            }
         },
         WORKER: {
             UPLOAD: '/worker/upload',
@@ -53,6 +50,10 @@ const ENDPOINTS = {
             UPLOAD: '/departments/upload',
             ADD: '/departments/add',
             DELETE: '/departments/delete',
+        },
+        SUB_DEPARTMENTS: {
+            ADD: '/sub_departments/add',
+            DELETE: '/sub_departments/delete',
         },
         JOINTS: {
             WORKER_DEPARTMENTS: '/joint/upload/worker-departments'
