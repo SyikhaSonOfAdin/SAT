@@ -9,10 +9,10 @@ const worker = new Worker();
 
 
 router.post(ENDPOINTS.POST.WORKER.EDIT,  async (req, res) => {
-    const { name, department_id, worker_id, shift } = req.body
+    const { name, department_id, department_type, worker_id, shift } = req.body
 
     try {
-        await worker.edit(name, department_id, worker_id, shift)
+        await worker.edit(name, department_id, department_type, worker_id, shift)
         res.status(200).json({
             status: 'success',
         })

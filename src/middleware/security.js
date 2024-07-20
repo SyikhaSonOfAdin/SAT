@@ -75,7 +75,6 @@ class Security {
     }
 
     encrypt = (value) => {
-        console.log("Kunci Enkripsi = " + this.#ENCRYPTION_KEY)
         const iv = crypto.randomBytes(this.#IV_LENGTH);
         const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(this.#ENCRYPTION_KEY), iv);
         let encrypted = cipher.update(value);

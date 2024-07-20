@@ -19,6 +19,7 @@ const PATH_CONF = {
         WORKER: {
             ADD: require('../APIS/POST/workers/add'),
             EDIT: require('../APIS/POST/workers/edit'),
+            EDIT_SHIFT: require('../APIS/POST/workers/editShift'),
             DELETE: require('../APIS/POST/workers/delete'),
         },
         JOINTS: {
@@ -70,6 +71,7 @@ const ARRAY_PATH = {
 
         PATH_CONF.POST.WORKER.DELETE,
         PATH_CONF.POST.WORKER.EDIT,
+        PATH_CONF.POST.WORKER.EDIT_SHIFT,
         PATH_CONF.POST.WORKER.ADD,
         
         PATH_CONF.POST.JOINTS.WORKER_DEPARTMENTS,

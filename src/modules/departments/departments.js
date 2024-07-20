@@ -30,8 +30,13 @@ class Departments {
              WHERE CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.COMPANY_ID} = ? 
              GROUP BY CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.ID} 
              ORDER BY CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.NAME}`,
-            `SELECT * FROM ${TABLES.LIST_SUB_DEPARTMENT.TABLE} AS LD 
-             WHERE LD.${TABLES.LIST_SUB_DEPARTMENT.COLUMN.DEPARTMENT_ID} = ?`
+            `SELECT sub.*, COUNT(lw.ID) AS MEMBER 
+            FROM list_sub_department AS sub 
+            LEFT JOIN list_worker AS lw ON sub.ID = lw.SUB_DEPARTMENT_ID 
+            JOIN company_departments AS CD ON sub.DEPARTMENT_ID = CD.ID
+            WHERE sub.DEPARTMENT_ID = ?
+            GROUP BY sub.ID;
+`
         ];
         const PARAMS = [[company_id]];
 

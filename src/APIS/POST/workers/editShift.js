@@ -3,28 +3,24 @@ const Departments = require("../../../modules/departments/departments");
 const Project = require("../../../modules/project/project");
 const express = require('express');
 const Worker = require("../../../modules/worker/worker");
-const security = require("../../../middleware/security");
 const router = express.Router();
 
 const worker = new Worker();
 
 
-router.post(ENDPOINTS.POST.WORKER.ADD,  async (req, res) => {
-    const { id, name, department_id, project_id, input_by, department_type } = req.body
+router.post(ENDPOINTS.POST.WORKER.EDIT_SHIFT,  async (req, res) => {
+    const { worker_id, shift } = req.body
 
     try {
-        const decrypted_projectId = await security.decrypt(project_id)
-        const decrypted_inputBy = await security.decrypt(input_by)
-
-        await worker.add(id, name, department_id, department_type, decrypted_projectId, decrypted_inputBy)
-        
+        await worker.editShift(worker_id, shift)
         res.status(200).json({
             status: 'success',
         })
-    } catch (error) {
+    } catch (error) {        
+        console.log(error.message)
         res.status(200).json({
             status: 'failed',
-            info: error.message
+            info: error
         })
     }
 });

@@ -44,6 +44,7 @@ const ENDPOINTS = {
             UPLOAD: '/worker/upload',
             DELETE: '/worker/delete',
             EDIT: '/worker/edit',
+            EDIT_SHIFT: '/worker/edit/shift',
             ADD: '/worker/add',
         },
         DEPARTMENTS: {
