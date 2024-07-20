@@ -1,6 +1,5 @@
 const ENDPOINTS = require("../../../.conf/endpoints");
 const Departments = require("../../../modules/departments/departments");
-const Project = require("../../../modules/project/project");
 const express = require('express');
 const router = express.Router();
 

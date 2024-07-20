@@ -35,8 +35,8 @@ class Departments {
             LEFT JOIN list_worker AS lw ON sub.ID = lw.SUB_DEPARTMENT_ID 
             JOIN company_departments AS CD ON sub.DEPARTMENT_ID = CD.ID
             WHERE sub.DEPARTMENT_ID = ?
-            GROUP BY sub.ID;
-`
+            GROUP BY sub.ID;`,
+            
         ];
         const PARAMS = [[company_id]];
 

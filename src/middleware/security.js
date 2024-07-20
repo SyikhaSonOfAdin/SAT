@@ -1,9 +1,10 @@
 const crypto = require('crypto');
 const SNC = require('../.conf/db-conf');
 const TABLES = require('../.conf/tables');
+const ENCRYPTION_KEY = require('../.conf/.app.conf');
 
 class Security {
-    #ENCRYPTION_KEY = crypto.randomBytes(32);
+    #ENCRYPTION_KEY = ENCRYPTION_KEY
     #IV_LENGTH = 16;
 
     getID = () => {
@@ -75,6 +76,7 @@ class Security {
     }
 
     encrypt = (value) => {
+        console.log(this.#ENCRYPTION_KEY)
         const iv = crypto.randomBytes(this.#IV_LENGTH);
         const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(this.#ENCRYPTION_KEY), iv);
         let encrypted = cipher.update(value);
