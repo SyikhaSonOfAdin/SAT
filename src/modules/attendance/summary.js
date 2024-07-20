@@ -50,7 +50,7 @@ class Summary {
             WHERE CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.ID} = ?
         `;
 
-        const PARAMS = [date, date, departments_id]; 
+        const PARAMS = [date, date, departments_id];
 
         try {
             const DATA = await CONNECTION.query(QUERY, PARAMS);
@@ -65,15 +65,15 @@ class Summary {
     getByDepartmentId = async (department_id, startDate, endDate) => {
         const CONNECTION = await SAT.getConnection()
         const QUERY = [
-            `WITH RECURSIVE DateRange AS ( SELECT ? AS DATE UNION ALL SELECT DATE_ADD(DATE, INTERVAL 1 DAY) FROM DateRange WHERE DATE < ?)
-            SELECT lw.ID AS WORKER_ID, lw.NAME AS NAME, COALESCE(ci.TIME, '-') AS TIME, dr.DATE AS DATE FROM list_worker AS lw 
-            JOIN company_departments AS cd ON lw.DEPARTMENT_ID = cd.ID 
-            JOIN DateRange AS dr
-            LEFT JOIN worker_checkin AS ci ON lw.ID = ci.WORKER_ID AND ci.DATE = dr.DATE 
-            WHERE cd.ID = ?
-            ORDER BY lw.ID, dr.DATE;`
+            `WITH RECURSIVE DateRange AS ( SELECT ? AS DATE  UNION ALL  SELECT DATE_ADD(DATE, INTERVAL 1 DAY)  FROM DateRange  WHERE DATE < ?) 
+            SELECT lw.ID AS WORKER_ID, lw.NAME AS NAME, COALESCE(ci.TIME, '-') AS CHECKIN, COALESCE(co.TIME, '-') AS CHECKOUT, dr.DATE AS DATE  FROM list_worker AS lw 
+            JOIN company_departments AS cd  ON lw.DEPARTMENT_ID = cd.ID  
+            JOIN DateRange AS dr 
+            LEFT JOIN worker_checkin AS ci  ON lw.ID = ci.WORKER_ID AND ci.DATE = dr.DATE 
+            LEFT JOIN worker_checkout AS co  ON lw.ID = co.WORKER_ID AND co.DATE = dr.DATE 
+            WHERE cd.ID = ? ORDER BY lw.ID, dr.DATE;`
         ]
-        const PARAMS = [[startDate, endDate,department_id]]
+        const PARAMS = [[startDate, endDate, department_id]]
 
         try {
             const DATA = await CONNECTION.query(QUERY[0], PARAMS[0])

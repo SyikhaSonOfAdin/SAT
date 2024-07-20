@@ -31,7 +31,7 @@ const TABLES = {
             NAME: "NAME",
         }
     },
-    LIST_SUB_DEPARTMENT: { // v1.4.0
+    LIST_SUB_DEPARTMENT: { // v2.0.0
         TABLE: "list_sub_department",
         COLUMN: {
             ID: "ID",
@@ -56,11 +56,11 @@ const TABLES = {
         COLUMN: {
             ID: "ID",
             DEPARTMENT_ID: "DEPARTMENT_ID",
-            SUB_DEPARTMENT_ID: "SUB_DEPARTMENT_ID",  // v1.4.0
+            SUB_DEPARTMENT_ID: "SUB_DEPARTMENT_ID",  // v2.0.0
             PROJECT_ID: "PROJECT_ID",
             INPUT_BY: "INPUT_BY",
             INPUT_DATE: "INPUT_DATE",
-            WORKER_ID: "WORKER_ID",  // v1.4.0
+            WORKER_ID: "WORKER_ID",  // v2.0.0
             NAME: "NAME",
             SHIFT: "SHIFT",
         }

@@ -9,7 +9,7 @@ class Departments {
             `INSERT INTO ${TABLES.COMPANY_DEPARTMENTS.TABLE} (${TABLES.COMPANY_DEPARTMENTS.COLUMN.COMPANY_ID}, ${TABLES.COMPANY_DEPARTMENTS.COLUMN.INPUT_BY}, ${TABLES.COMPANY_DEPARTMENTS.COLUMN.NAME})
             VALUES (?, ?, ?)`
         ]
-        const PARAMS =[[company_id, user_id, name]]
+        const PARAMS = [[company_id, user_id, name]]
 
         try {
             await CONNECTION.query(QUERY[0], PARAMS[0])
@@ -21,31 +21,47 @@ class Departments {
     }
 
     get = async (company_id) => {
-        const CONNECTION = await SAT.getConnection()
+        const CONNECTION = await SAT.getConnection();
         const QUERY = [
-            `SELECT CD.*, U.${TABLES.USER.COLUMN.USERNAME} AS INPUT_BY, COUNT(LW.${TABLES.LIST_WORKER.COLUMN.ID}) AS MEMBER FROM ${TABLES.COMPANY_DEPARTMENTS.TABLE} AS CD 
-            JOIN ${TABLES.USER.TABLE} AS U ON CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.INPUT_BY} = U.${TABLES.USER.COLUMN.ID}
-            LEFT JOIN ${TABLES.LIST_WORKER.TABLE} AS LW ON CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.ID} = LW.${TABLES.LIST_WORKER.COLUMN.DEPARTMENT_ID}
-            WHERE CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.COMPANY_ID} = ? GROUP BY CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.ID} ORDER BY CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.NAME}`
-        ]
-        const PARAMS =[[company_id]]
+            `SELECT CD.*, U.${TABLES.USER.COLUMN.USERNAME} AS INPUT_BY, COUNT(LW.${TABLES.LIST_WORKER.COLUMN.ID}) AS MEMBER 
+             FROM ${TABLES.COMPANY_DEPARTMENTS.TABLE} AS CD 
+             JOIN ${TABLES.USER.TABLE} AS U ON CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.INPUT_BY} = U.${TABLES.USER.COLUMN.ID}
+             LEFT JOIN ${TABLES.LIST_WORKER.TABLE} AS LW ON CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.ID} = LW.${TABLES.LIST_WORKER.COLUMN.DEPARTMENT_ID}
+             WHERE CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.COMPANY_ID} = ? 
+             GROUP BY CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.ID} 
+             ORDER BY CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.NAME}`,
+            `SELECT * FROM ${TABLES.LIST_SUB_DEPARTMENT.TABLE} AS LD 
+             WHERE LD.${TABLES.LIST_SUB_DEPARTMENT.COLUMN.DEPARTMENT_ID} = ?`
+        ];
+        const PARAMS = [[company_id]];
 
         try {
-            const DATA = await CONNECTION.query(QUERY[0], PARAMS[0])
-            return DATA
+            const [data] = await CONNECTION.query(QUERY[0], PARAMS[0]);
+            if (data.length && data.length > 0) {
+                const results = await Promise.all(data.map(async (item) => {
+                    const subDepartments = await CONNECTION.query(QUERY[1], [item.ID]);
+                    return {
+                        ...item,
+                        SUB_DEPARTMENTS: subDepartments[0]
+                    };
+                }));
+                return results;
+            }
+            return data;
         } catch (error) {
-            throw error
+            throw error;
         } finally {
-            CONNECTION.release()
+            CONNECTION.release();
         }
-    }
+    };
+
 
     edit = async (department_id) => {
         const CONNECTION = await SAT.getConnection()
         const QUERY = [
             `UPDATE ${TABLES.COMPANY_DEPARTMENTS.TABLE} SET ${TABLES.COMPANY_DEPARTMENTS.COLUMN.NAME} = ? WHERE ${TABLES.COMPANY_DEPARTMENTS.COLUMN.ID} = ?`
         ]
-        const PARAMS =[[department_id]]
+        const PARAMS = [[department_id]]
 
         try {
             await CONNECTION.query(QUERY[0], PARAMS[0])
@@ -61,7 +77,7 @@ class Departments {
         const QUERY = [
             `DELETE FROM ${TABLES.COMPANY_DEPARTMENTS.TABLE} WHERE ${TABLES.COMPANY_DEPARTMENTS.COLUMN.ID} = ?`
         ]
-        const PARAMS =[[department_id]]
+        const PARAMS = [[department_id]]
 
         try {
             await CONNECTION.query(QUERY[0], PARAMS[0])

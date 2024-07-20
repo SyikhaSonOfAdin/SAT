@@ -9,9 +9,7 @@ const worker = new Worker()
 const department = new Departments()
 
 router.get(ENDPOINTS.GET.WORKER.GETID, async (req, res) => {
-    const id = req.query.id
-    const company_id = req.params.company_id    
-    const project_id = req.params.project_id
+    const id = req.query.id    
     
     try {
 

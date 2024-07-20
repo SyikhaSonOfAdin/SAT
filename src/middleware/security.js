@@ -75,6 +75,7 @@ class Security {
     }
 
     encrypt = (value) => {
+        console.log("Kunci Enkripsi = " + this.#ENCRYPTION_KEY)
         const iv = crypto.randomBytes(this.#IV_LENGTH);
         const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(this.#ENCRYPTION_KEY), iv);
         let encrypted = cipher.update(value);
@@ -82,15 +83,19 @@ class Security {
         return iv.toString('hex') + ':' + encrypted.toString('hex');
     }
 
-    decrypt = (value) => {
-        const textParts = value.split(':');
-        const iv = Buffer.from(textParts.shift(), 'hex');
-        const encryptedText = Buffer.from(textParts.join(':'), 'hex');
-        const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(this.#ENCRYPTION_KEY), iv);
-        let decrypted = decipher.update(encryptedText);
-        decrypted = Buffer.concat([decrypted, decipher.final()]);
-        return decrypted.toString();
-      }
+    decrypt = async (value) => {
+        try {
+            const textParts = value.split(':');
+            const iv = Buffer.from(textParts.shift(), 'hex');
+            const encryptedText = Buffer.from(textParts.join(':'), 'hex');
+            const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(this.#ENCRYPTION_KEY), iv);
+            let decrypted = decipher.update(encryptedText);
+            decrypted = Buffer.concat([decrypted, decipher.final()]);
+            return decrypted.toString();
+        } catch (error) {
+            throw new Error("Invalid session. Please log in again.")
+        }
+    }
 }
 const security = new Security();
 module.exports = security

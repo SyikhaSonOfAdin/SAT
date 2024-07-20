@@ -2,7 +2,10 @@ const ENDPOINTS = require("../../../.conf/endpoints");
 const security = require("../../../middleware/security");
 const Security = require("../../../middleware/security");
 const express = require('express');
+const Project = require("../../../modules/project/project");
+
 const router = express.Router();
+const project = new Project()
 
 
 router.post(ENDPOINTS.POST.PROJECT.ADD, security.checkPassId, async (req, res) => {
@@ -16,7 +19,7 @@ router.post(ENDPOINTS.POST.PROJECT.ADD, security.checkPassId, async (req, res) =
     } catch (error) {
         res.status(200).json({
             status: 'failed',
-            info: error
+            info: error.message
         })
     }
 });

@@ -1,16 +1,18 @@
 const SubDepartment = require("../../../modules/departments/subDepartment");
 const ENDPOINTS = require("../../../.conf/endpoints");
 const express = require('express');
+const security = require("../../../middleware/security");
 const router = express.Router();
 
 const subDepartment = new SubDepartment();
 
 
 router.post(ENDPOINTS.POST.SUB_DEPARTMENTS.ADD,  async (req, res) => {
-    const { department_id, user_id, name } = req.body
+    const { department_id, uId, name } = req.body
 
     try {
-        await subDepartment.add(department_id, user_id, name)
+        const decrypted_uId = await security.decrypt(uId)
+        await subDepartment.add(department_id, decrypted_uId, name)
         res.status(200).json({
             status: 'success',
         })

@@ -25,7 +25,7 @@ const PATH_CONF = {
             WORKER_DEPARTMENTS: require('../APIS/POST/uploadData/workerAndDepartments')
         },
         DEPARTMENTS: {
-            ADD: require('../APIS/POST/departments/addDepartments'),
+            ADD: require('../APIS/POST/departments/add'),
             DELETE: require('../APIS/POST/departments/delete'),
         },
         SUB_DEPARTMENTS: {

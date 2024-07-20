@@ -19,16 +19,16 @@ class Users {
             
             if (isExist[0].length > 0) {
                 return {
-                    authentication: true,
-                    id: security.encrypt(isExist[0][0]["ID"].toString()),
-                    email: security.encrypt(isExist[0][0]["EMAIL"]),
-                    password: security.encrypt(isExist[0][0]["PASSWORD"]),
-                    username: isExist[0][0]["USERNAME"],
-                    level: security.encrypt(isExist[0][0]["LEVEL"].toString()),
-                    company_id: security.encrypt(isExist[0][0]["COMPANY_ID"].toString()),
-                    company_name: isExist[0][0]["COMPANY_NAME"],
-                    project_id: security.encrypt(isExist[0][0]["PROJECT_ID"].toString()),
-                    project_name: isExist[0][0]["PROJECT_NAME"],
+                    aKey: true, //Authentication
+                    uId: security.encrypt(isExist[0][0]["ID"].toString()), //User Id
+                    eAddr: security.encrypt(isExist[0][0]["EMAIL"]), //Email
+                    pCode: security.encrypt(isExist[0][0]["PASSWORD"]), //Password
+                    uName: isExist[0][0]["USERNAME"], //Username
+                    lvlCode: isExist[0][0]["LEVEL"], //Level
+                    cidToken: security.encrypt(isExist[0][0]["COMPANY_ID"].toString()), //Company Id
+                    cName: isExist[0][0]["COMPANY_NAME"], //Company Name
+                    projId: security.encrypt(isExist[0][0]["PROJECT_ID"].toString()), //Project Id
+                    projName: isExist[0][0]["PROJECT_NAME"], //Project Name
                 }
             } else {
                 return {
