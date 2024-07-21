@@ -1,11 +1,10 @@
 const crypto = require('crypto');
 const SNC = require('../.conf/db-conf');
 const TABLES = require('../.conf/tables');
-const ENCRYPTION_KEY = require('../.conf/.app.conf');
 
 class Security {
-    #ENCRYPTION_KEY = ENCRYPTION_KEY
-    #IV_LENGTH = 16;
+    #ENCRYPTION_KEY = Buffer.from('19032004Muchamad'); // 16 byte key for AES-128
+    #IV_LENGTH = Buffer.from('f4b6c2d7e891a4b2'); // 16 byte IV
 
     getID = () => {
         return crypto.randomBytes(16).toString('hex');
@@ -75,27 +74,19 @@ class Security {
         }
     }
 
-    encrypt = (value) => {
-        console.log(this.#ENCRYPTION_KEY)
-        const iv = crypto.randomBytes(this.#IV_LENGTH);
-        const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(this.#ENCRYPTION_KEY), iv);
-        let encrypted = cipher.update(value);
-        encrypted = Buffer.concat([encrypted, cipher.final()]);
-        return iv.toString('hex') + ':' + encrypted.toString('hex');
+    encrypt = (text) => {
+        const cipher = crypto.createCipheriv('aes-128-cbc', this.#ENCRYPTION_KEY, this.#IV_LENGTH);
+        let encrypted = cipher.update(text, 'utf8', 'hex');
+        encrypted += cipher.final('hex');
+        return encrypted;
     }
 
-    decrypt = async (value) => {
-        try {
-            const textParts = value.split(':');
-            const iv = Buffer.from(textParts.shift(), 'hex');
-            const encryptedText = Buffer.from(textParts.join(':'), 'hex');
-            const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(this.#ENCRYPTION_KEY), iv);
-            let decrypted = decipher.update(encryptedText);
-            decrypted = Buffer.concat([decrypted, decipher.final()]);
-            return decrypted.toString();
-        } catch (error) {
-            throw new Error("Invalid session. Please log in again.")
-        }
+
+    decrypt = (text) => {
+        const decipher = crypto.createDecipheriv('aes-128-cbc', this.#ENCRYPTION_KEY, this.#IV_LENGTH);
+        let decrypted = decipher.update(text, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        return decrypted;
     }
 }
 const security = new Security();

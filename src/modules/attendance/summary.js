@@ -6,19 +6,56 @@ class Summary {
     getSummary = async (date) => {
         const CONNECTION = await SAT.getConnection();
         const QUERY = `
-            SELECT cd.ID, cd.NAME AS DEPARTMENTS,        
-        COALESCE(SUM(CASE WHEN ci.DATE = ? AND ci.SHIFT = 0 THEN 1 ELSE 0 END), 0) AS PRESENT    , 
-        COALESCE(SUM(CASE WHEN ci.DATE IS NULL AND co.DATE IS NULL THEN 1 ELSE 0 END), 0) AS ABSENT,
-        COALESCE(SUM(CASE WHEN (ci.DATE = ? AND ci.SHIFT = 1) OR (co.DATE = ? AND co.SHIFT = 1) THEN 1 ELSE 0 END), 0) AS NIGHT_SHIFT,
-        COUNT(lw.ID) AS TOTAL       
-        FROM list_worker AS lw 
-        JOIN company_departments AS cd ON lw.DEPARTMENT_ID = cd.ID 
-        LEFT JOIN worker_checkin AS ci ON lw.ID = ci.WORKER_ID AND ci.DATE = ?
-        LEFT JOIN worker_checkout AS co ON lw.ID = co.WORKER_ID AND co.DATE = ?
-        GROUP BY cd.ID, cd.NAME ORDER BY cd.NAME;
+          -- Untuk Departemen Utama
+SELECT 
+    cd.ID AS ID, 
+    cd.NAME AS DEPARTMENTS, 
+    NULL AS SUB_DEPARTMENT_ID, 
+    NULL AS SUB_NAME, 
+    COALESCE(SUM(CASE WHEN ci.DATE = ? AND ci.SHIFT = 0 THEN 1 ELSE 0 END), 0) AS PRESENT, 
+    COALESCE(SUM(CASE WHEN lw.ID IS NOT NULL AND ci.WORKER_ID IS NULL AND co.WORKER_ID IS NULL THEN 1 ELSE 0 END), 0) AS ABSENT, 
+    COALESCE(SUM(CASE WHEN (ci.DATE = ? AND ci.SHIFT = 1) OR (co.DATE = ? AND co.SHIFT = 1) THEN 1 ELSE 0 END), 0) AS NIGHT_SHIFT, 
+    COUNT(lw.ID) AS TOTAL 
+FROM 
+    company_departments AS cd 
+LEFT JOIN 
+    list_worker AS lw ON lw.DEPARTMENT_ID = cd.ID AND lw.SUB_DEPARTMENT_ID IS NULL
+LEFT JOIN 
+    worker_checkin AS ci ON lw.ID = ci.WORKER_ID AND ci.DATE = ? 
+LEFT JOIN 
+    worker_checkout AS co ON lw.ID = co.WORKER_ID AND co.DATE = ? 
+GROUP BY 
+    cd.ID, cd.NAME 
+
+UNION ALL
+
+-- Untuk Sub-Departemen
+SELECT 
+    cd.ID AS ID, 
+    cd.NAME AS DEPARTMENTS, 
+    sd.ID AS SUB_DEPARTMENT_ID, 
+    sd.NAME AS SUB_NAME, 
+    COALESCE(SUM(CASE WHEN ci.DATE = ? AND ci.SHIFT = 0 THEN 1 ELSE 0 END), 0) AS PRESENT, 
+    COALESCE(SUM(CASE WHEN lw.ID IS NOT NULL AND ci.WORKER_ID IS NULL AND co.WORKER_ID IS NULL THEN 1 ELSE 0 END), 0) AS ABSENT, 
+    COALESCE(SUM(CASE WHEN (ci.DATE = ? AND ci.SHIFT = 1) OR (co.DATE = ? AND co.SHIFT = 1) THEN 1 ELSE 0 END), 0) AS NIGHT_SHIFT, 
+    COUNT(lw.ID) AS TOTAL 
+FROM 
+    company_departments AS cd 
+JOIN 
+    list_sub_department AS sd ON cd.ID = sd.DEPARTMENT_ID 
+LEFT JOIN 
+    list_worker AS lw ON lw.SUB_DEPARTMENT_ID = sd.ID 
+LEFT JOIN 
+    worker_checkin AS ci ON lw.ID = ci.WORKER_ID AND ci.DATE = ? 
+LEFT JOIN 
+    worker_checkout AS co ON lw.ID = co.WORKER_ID AND co.DATE = ? 
+GROUP BY 
+    cd.ID, cd.NAME, sd.ID, sd.NAME 
+ORDER BY 
+    DEPARTMENTS, SUB_NAME;
         `;
 
-        const PARAMS = [date, date, date, date, date];
+        const PARAMS = [date, date, date, date, date, date, date, date, date, date];
 
         try {
             const DATA = await CONNECTION.query(QUERY, PARAMS);
@@ -51,6 +88,37 @@ class Summary {
         `;
 
         const PARAMS = [date, date, departments_id];
+
+        try {
+            const DATA = await CONNECTION.query(QUERY, PARAMS);
+            return DATA;
+        } catch (error) {
+            throw error;
+        } finally {
+            CONNECTION.release();
+        }
+    }
+
+    getByDateandSubDepartment = async (date, sub_departments_id) => {
+        const CONNECTION = await SAT.getConnection();
+        const QUERY = `
+            SELECT LW.${TABLES.LIST_WORKER.COLUMN.NAME}, COALESCE(DATE_FORMAT(CI.${TABLES.WORKER_CHECKIN.COLUMN.DATE}, '%Y-%m-%d'), DATE_FORMAT(CO.${TABLES.WORKER_CHECKOUT.COLUMN.DATE}, '%Y-%m-%d')) AS DATE,
+                   COALESCE(CO.${TABLES.WORKER_CHECKOUT.COLUMN.SHIFT}, CI.${TABLES.WORKER_CHECKIN.COLUMN.SHIFT}) AS SHIFT, 
+                   CI.${TABLES.WORKER_CHECKIN.COLUMN.TIME} AS CHECKIN, 
+                   CO.${TABLES.WORKER_CHECKOUT.COLUMN.TIME} AS CHECKOUT 
+            FROM ${TABLES.LIST_WORKER.TABLE} AS LW 
+            JOIN ${TABLES.LIST_SUB_DEPARTMENT.TABLE} AS CD 
+                ON LW.${TABLES.LIST_WORKER.COLUMN.SUB_DEPARTMENT_ID} = CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.ID} 
+            LEFT JOIN ${TABLES.WORKER_CHECKIN.TABLE} AS CI 
+                ON LW.${TABLES.LIST_WORKER.COLUMN.ID} = CI.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID} 
+                AND CI.${TABLES.WORKER_CHECKIN.COLUMN.DATE} = ? 
+            LEFT JOIN ${TABLES.WORKER_CHECKOUT.TABLE} AS CO 
+                ON LW.${TABLES.LIST_WORKER.COLUMN.ID} = CO.${TABLES.WORKER_CHECKOUT.COLUMN.WORKER_ID} 
+                AND CO.${TABLES.WORKER_CHECKOUT.COLUMN.DATE} = ? 
+            WHERE CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.ID} = ?
+        `;
+
+        const PARAMS = [date, date, sub_departments_id];
 
         try {
             const DATA = await CONNECTION.query(QUERY, PARAMS);

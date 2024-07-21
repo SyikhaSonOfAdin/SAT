@@ -5,6 +5,7 @@ const ENDPOINTS = {
         SUMMARY: {
             BYDATE: '/summary/bydate/:user_id/:project_id',
             BYDATE_DEPARTMENT: '/summary/bydatedepartment/:user_id/:project_id',
+            BYDATE_SUB_DEPARTMENT: '/summary/bydatesubdepartment/:user_id/:project_id',
             DEPARTMENT: '/summary/department/:department_id/:company_id',
             NUMBER_OF: '/summary/dashboard/numbers/:company_id/:project_id',            
         },
