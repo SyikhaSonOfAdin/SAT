@@ -1,7 +1,8 @@
 const PATH_CONF = {
     POST: {
         COMPANY: {
-            ADD: require('../APIS/POST/company/add')
+            ADD: require('../APIS/POST/company/add'),
+            LOGIN: require('../APIS/POST/company/login'),
         },
         PROJECT: {
             ADD: require('../APIS/POST/project/add')
@@ -55,6 +56,9 @@ const PATH_CONF = {
             BYPROJECTID: require('../APIS/GET/workers/getByProjectId'),
             GETID: require('../APIS/GET/workers/getId'),
             UNREGISTERED_WORKERS: require('../APIS/GET/workers/getUnregisteredWorkers'),
+        },
+        PROJECTS: {
+            BY_COMPANYID: require('../APIS/GET/project/getByCompanyId')
         }
     }
 }
@@ -62,6 +66,8 @@ const PATH_CONF = {
 const ARRAY_PATH = {
     POST: [
         PATH_CONF.POST.COMPANY.ADD,
+        PATH_CONF.POST.COMPANY.LOGIN,
+        
         PATH_CONF.POST.PROJECT.ADD,
 
         PATH_CONF.POST.USERS.LOGIN,
@@ -98,6 +104,8 @@ const ARRAY_PATH = {
         PATH_CONF.GET.WORKERS.BYPROJECTID,
         PATH_CONF.GET.WORKERS.GETID,
         PATH_CONF.GET.WORKERS.UNREGISTERED_WORKERS,
+
+        PATH_CONF.GET.PROJECTS.BY_COMPANYID,
     ]
 }
 module.exports = ARRAY_PATH;

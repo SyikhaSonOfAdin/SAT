@@ -16,6 +16,9 @@ const ENDPOINTS = {
             BYPROJECTID: '/workers/:project_id/:company_id',
             GETID: '/workers/getid/:project_id/:company_id',
             UNREGISTERED_WORKERS: '/workers/getunregisteredworkers/:project_id/:company_id',
+        },
+        PROJECTS: {
+            BY_COMPAYID: '/projects/:company_id/:password'
         }
     },
     POST: {
@@ -23,6 +26,7 @@ const ENDPOINTS = {
             ADD: '/company/add',   
             EDIT: '/company/edit/:company_id/:pass_id',
             DELETE: '/company/delete/:company_id/:pass_id',
+            LOGIN: '/company/login',
         },
         PROJECT: {
             ADD: '/project/add/:company_id/:pass_id',

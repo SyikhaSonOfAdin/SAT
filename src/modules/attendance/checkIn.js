@@ -19,9 +19,22 @@ class CheckIn {
         }
     }
 
+    addWC = async (CONNECTION, worker_id, date, time) => {
+        const QUERY = [
+            `INSERT INTO ${TABLES.WORKER_CHECKIN.TABLE} (${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID}, ${TABLES.WORKER_CHECKIN.COLUMN.DATE}, ${TABLES.WORKER_CHECKIN.COLUMN.TIME}, ${TABLES.WORKER_CHECKIN.COLUMN.SHIFT}) 
+            VALUES (?, ?, ?, COALESCE((SELECT CI.${TABLES.LIST_WORKER.COLUMN.SHIFT} FROM ${TABLES.LIST_WORKER.TABLE} AS CI WHERE CI.${TABLES.LIST_WORKER.COLUMN.ID} = ?), 0 ))`
+        ]
+        const PARAMS = [[worker_id, date, time, worker_id]]
+
+        try {
+            await CONNECTION.query(QUERY[0], PARAMS[0])            
+        } catch (error) {
+            throw error
+        }
+    }
+
     
-    cleanUp = async () => {
-        const CONNECTION = await SAT.getConnection()
+    cleanUp = async (CONNECTION) => {
         const QUERY = [
             `DELETE FROM ${TABLES.WORKER_CHECKIN.TABLE} WHERE ${TABLES.WORKER_CHECKIN.COLUMN.ID} IN 
             ( SELECT wc1.${TABLES.WORKER_CHECKIN.COLUMN.ID} FROM ${TABLES.WORKER_CHECKIN.TABLE} AS wc1 JOIN ${TABLES.WORKER_CHECKIN.TABLE} AS wc2 ON wc1.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID} = wc2.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID} 
@@ -36,8 +49,6 @@ class CheckIn {
             }
         } catch (error) {
             throw error
-        } finally {
-            CONNECTION.release()
         }
     }
 

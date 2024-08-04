@@ -19,9 +19,22 @@ class CheckOut {
         }
     }
 
+    addWC = async (CONNECTION, worker_id, date, time) => {
+        const QUERY = [
+            `INSERT INTO ${TABLES.WORKER_CHECKOUT.TABLE} (${TABLES.WORKER_CHECKOUT.COLUMN.WORKER_ID}, ${TABLES.WORKER_CHECKOUT.COLUMN.DATE}, ${TABLES.WORKER_CHECKOUT.COLUMN.TIME}, ${TABLES.WORKER_CHECKOUT.COLUMN.SHIFT}) 
+            VALUES (?, ?, ?, COALESCE((SELECT CI.${TABLES.LIST_WORKER.COLUMN.SHIFT} FROM ${TABLES.LIST_WORKER.TABLE} AS CI WHERE CI.${TABLES.LIST_WORKER.COLUMN.ID} = ?), 0 ))`
+        ]
+        const PARAMS = [[worker_id, date, time, worker_id]]
 
-    cleanUp = async () => {
-        const CONNECTION = await SAT.getConnection()
+        try {
+            await CONNECTION.query(QUERY[0], PARAMS[0])
+        } catch (error) {
+            throw error
+        }
+    }
+
+
+    cleanUp = async (CONNECTION) => {
         const QUERY = [
             `DELETE FROM ${TABLES.WORKER_CHECKOUT.TABLE} WHERE ${TABLES.WORKER_CHECKOUT.COLUMN.ID} IN 
             ( SELECT wc1.${TABLES.WORKER_CHECKOUT.COLUMN.ID} FROM ${TABLES.WORKER_CHECKOUT.TABLE} AS wc1 JOIN ${TABLES.WORKER_CHECKOUT.TABLE} AS wc2 ON wc1.${TABLES.WORKER_CHECKOUT.COLUMN.WORKER_ID} = wc2.${TABLES.WORKER_CHECKOUT.COLUMN.WORKER_ID} 
@@ -36,8 +49,6 @@ class CheckOut {
             }
         } catch (error) {
             throw error
-        } finally {
-            CONNECTION.release()
         }
     }
 
@@ -114,6 +125,22 @@ class CheckOut {
             throw error;
         } finally {
             CONNECTION.release();
+        }
+    };
+
+    isNightShiftWC = async (CONNECTION, worker_id) => {
+        const QUERY = `SELECT SHIFT FROM ${TABLES.LIST_WORKER.TABLE} WHERE ${TABLES.LIST_WORKER.COLUMN.ID} = ?`;
+        const PARAMS = [worker_id];
+
+        try {
+            const [rows] = await CONNECTION.query(QUERY, PARAMS);
+            if (rows.length > 0) {
+                return rows[0].SHIFT == 1;
+            } else {
+                return false;
+            }
+        } catch (error) {
+            throw error;
         }
     };
 
