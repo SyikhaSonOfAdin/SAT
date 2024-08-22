@@ -33,19 +33,38 @@ class CheckIn {
         }
     }
 
+    bulkAddWC = async (CONNECTION, data) => {
+        if (data.length === 0) return;
+        const QUERY = [
+            `INSERT INTO ${TABLES.WORKER_CHECKIN.TABLE} (${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID}, ${TABLES.WORKER_CHECKIN.COLUMN.DATE}, ${TABLES.WORKER_CHECKIN.COLUMN.TIME}, ${TABLES.WORKER_CHECKIN.COLUMN.SHIFT}) 
+            VALUES ?`
+        ]
+
+        try {
+            await CONNECTION.query(QUERY[0], [data])
+        } catch (error) {
+            throw error
+        }
+    }
+
     
     cleanUp = async (CONNECTION) => {
         const QUERY = [
-            `DELETE FROM ${TABLES.WORKER_CHECKIN.TABLE} WHERE ${TABLES.WORKER_CHECKIN.COLUMN.ID} IN 
-            ( SELECT wc1.${TABLES.WORKER_CHECKIN.COLUMN.ID} FROM ${TABLES.WORKER_CHECKIN.TABLE} AS wc1 JOIN ${TABLES.WORKER_CHECKIN.TABLE} AS wc2 ON wc1.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID} = wc2.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID} 
-             AND wc1.${TABLES.WORKER_CHECKIN.COLUMN.DATE} = wc2.${TABLES.WORKER_CHECKIN.COLUMN.DATE} AND wc1.${TABLES.WORKER_CHECKIN.COLUMN.TIME} > wc2.${TABLES.WORKER_CHECKIN.COLUMN.TIME});`,
+            `DELETE wc1
+            FROM ${TABLES.WORKER_CHECKIN.TABLE} wc1
+            JOIN ${TABLES.WORKER_CHECKIN.TABLE} wc2 
+            ON wc1.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID} = wc2.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID}
+            AND wc1.${TABLES.WORKER_CHECKIN.COLUMN.DATE} = wc2.${TABLES.WORKER_CHECKIN.COLUMN.DATE}
+            AND wc1.${TABLES.WORKER_CHECKIN.COLUMN.TIME} > wc2.${TABLES.WORKER_CHECKIN.COLUMN.TIME};`,
             `DELETE t1 FROM ${TABLES.WORKER_CHECKIN.TABLE} t1 JOIN ${TABLES.WORKER_CHECKIN.TABLE} t2 ON t1.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID} = t2.${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID} 
             AND t1.${TABLES.WORKER_CHECKIN.COLUMN.DATE} = t2.${TABLES.WORKER_CHECKIN.COLUMN.DATE} AND t1.${TABLES.WORKER_CHECKIN.COLUMN.TIME} = t2.${TABLES.WORKER_CHECKIN.COLUMN.TIME} 
             AND t1.${TABLES.WORKER_CHECKIN.COLUMN.ID} > t2.${TABLES.WORKER_CHECKIN.COLUMN.ID};`
         ]
         try {
             for (let i = 0; i < QUERY.length; i++) {
+                console.time(`Query CheckIn ${i}`)
                 await CONNECTION.query(QUERY[i])
+                console.timeEnd(`Query CheckIn ${i}`)
             }
         } catch (error) {
             throw error
