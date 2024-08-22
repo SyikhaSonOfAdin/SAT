@@ -36,6 +36,10 @@ router.post(ENDPOINTS.POST.ONE_GATE.UPLOAD.DAT, storage.dat.array('files'), asyn
     console.time('Execution Time Dat Bulk'); // Start timing the execution
 
     try {
+
+        res.status(200).json({
+            status: 'upload success, processing',
+        });
         
         CONNECTION = await SAT.getConnection();
         await CONNECTION.beginTransaction();
@@ -130,20 +134,15 @@ router.post(ENDPOINTS.POST.ONE_GATE.UPLOAD.DAT, storage.dat.array('files'), asyn
         console.timeEnd('Execution Cleanup data');
         
         // Commit transaksi
-        await CONNECTION.commit();
-
-        res.status(200).json({
-            status: 'upload success, processing',
-        });
+        await CONNECTION.commit();        
 
     } catch (error) {
         if (CONNECTION) {
             await CONNECTION.rollback();
         }
-        console.log(error.message);
-        res.status(500).json({
-            message: error.message
-        });
+        // res.status(500).json({
+        //     message: error.message
+        // });
     } finally {
         if (CONNECTION) {
             CONNECTION.release();
