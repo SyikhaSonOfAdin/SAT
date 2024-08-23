@@ -11,16 +11,27 @@ const department = new Departments()
 
 router.get(ENDPOINTS.GET.WORKER.BYPROJECTID, async (req, res) => {
     const department_id = req.query.department_id
+    const based_on = req.query.based_on
     const perPage = req.query.per_page
     const search = req.query.search
+    const shift = req.query.shift
     const page = req.query.page
-    
+
+    const shiftData = ["All Shift", "Day Shift", "Night Shift"]
+    const based_onData = ["Name", "Worker Id"]
+
+    if (!shiftData.includes(shift) || !based_onData.includes(based_on)) {
+        return res.status(400).json({
+            message: 'Invalid Parameter'
+        })
+    }
+
     try {
-        const company_id = await security.decrypt(req.params.company_id)    
-        const project_id = await security.decrypt(req.params.project_id)    
-        const WORKER_DATA = await worker.getByProjectId(project_id, search, department_id, page, perPage)
+        const company_id = security.decrypt(req.params.company_id)
+        const project_id = security.decrypt(req.params.project_id)
+        const WORKER_DATA = await worker.getByProjectId(project_id, search, based_on, department_id, shift, page, perPage)
         const DEPARTEMENT_DATA = await department.get(company_id)
-        
+
         res.status(200).json({
             data: WORKER_DATA[0],
             additional: DEPARTEMENT_DATA,
@@ -38,4 +49,4 @@ router.get(ENDPOINTS.GET.WORKER.BYPROJECTID, async (req, res) => {
     }
 })
 
-module.exports = router ;
+module.exports = router;

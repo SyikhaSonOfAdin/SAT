@@ -130,21 +130,41 @@ ORDER BY
         }
     }
 
-    getByDepartmentId = async (department_id, startDate, endDate) => {
+    getByDepartmentId = async (search, based_on, shift, department_id, startDate, endDate) => {
         const CONNECTION = await SAT.getConnection()
-        const QUERY = [
+        let QUERY = [
             `WITH RECURSIVE DateRange AS ( SELECT ? AS DATE  UNION ALL  SELECT DATE_ADD(DATE, INTERVAL 1 DAY)  FROM DateRange  WHERE DATE < ?) 
             SELECT lw.ID AS WORKER_ID, lw.NAME AS NAME, COALESCE(ci.TIME, '-') AS CHECKIN, COALESCE(co.TIME, '-') AS CHECKOUT, dr.DATE AS DATE  FROM list_worker AS lw 
             JOIN company_departments AS cd  ON lw.DEPARTMENT_ID = cd.ID  
             JOIN DateRange AS dr 
             LEFT JOIN worker_checkin AS ci  ON lw.ID = ci.WORKER_ID AND ci.DATE = dr.DATE 
             LEFT JOIN worker_checkout AS co  ON lw.ID = co.WORKER_ID AND co.DATE = dr.DATE 
-            WHERE cd.ID = ? ORDER BY lw.ID, dr.DATE;`
+            WHERE cd.ID = ?`
         ]
-        const PARAMS = [[startDate, endDate, department_id]]
+        const PARAMS = [startDate, endDate, department_id]
+
+        if (shift !== "All Shift") {
+            if (shift == "Day Shift") {
+                QUERY[0] += ` AND lw.${TABLES.LIST_WORKER.COLUMN.SHIFT} = 0`;
+            } else if (shift == "Night Shift") {
+                QUERY[0] += ` AND lw.${TABLES.LIST_WORKER.COLUMN.SHIFT} = 1`;
+            }
+        }
+
+        if (search !== "") {
+            if (based_on == "Name") {
+                QUERY[0] += ` AND lw.${TABLES.LIST_WORKER.COLUMN.NAME} LIKE ?`;
+                PARAMS.push(`%${search}%`);
+            } else if (based_on == "Worker Id") {
+                QUERY[0] += ` AND lw.${TABLES.LIST_WORKER.COLUMN.ID} LIKE ?`;
+                PARAMS.push(`%${search}%`);
+            }
+        }
+
+        QUERY[0] += ` ORDER BY lw.ID, dr.DATE;`
 
         try {
-            const DATA = await CONNECTION.query(QUERY[0], PARAMS[0])
+            const DATA = await CONNECTION.query(QUERY[0], PARAMS)
             return DATA
         } catch (error) {
             throw error
