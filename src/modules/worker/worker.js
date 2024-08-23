@@ -122,7 +122,7 @@ class Worker {
         }
     }
 
-    getByProjectId = async (project_id, search, department_id, page, per_page) => {
+    getByProjectId = async (project_id, search, based_on, department_id, shift, page, per_page) => {
         const CONNECTION = await SAT.getConnection();
         const LIMIT = parseInt(per_page);
         const OFFSET = page * LIMIT;
@@ -139,9 +139,7 @@ class Worker {
     ON LW.${TABLES.LIST_WORKER.COLUMN.DEPARTMENT_ID} = CD.${TABLES.COMPANY_DEPARTMENTS.COLUMN.ID}
     LEFT JOIN ${TABLES.LIST_SUB_DEPARTMENT.TABLE} AS SD 
     ON LW.${TABLES.LIST_WORKER.COLUMN.SUB_DEPARTMENT_ID} = SD.${TABLES.LIST_SUB_DEPARTMENT.COLUMN.ID}
-    WHERE LW.${TABLES.LIST_WORKER.COLUMN.PROJECT_ID} = ? 
-`;
-
+    WHERE LW.${TABLES.LIST_WORKER.COLUMN.PROJECT_ID} = ? `;
 
         const PARAMS = [project_id];
 
@@ -150,9 +148,22 @@ class Worker {
             PARAMS.push(department_id);
         }
 
+        if (shift !== "All Shift") {
+            if (shift == "Day Shift") {
+                QUERY += ` AND LW.${TABLES.LIST_WORKER.COLUMN.SHIFT} = 0`;
+            } else if (shift == "Night Shift") {
+                QUERY += ` AND LW.${TABLES.LIST_WORKER.COLUMN.SHIFT} = 1`;
+            }
+        }
+
         if (search !== "") {
-            QUERY += ` AND LW.${TABLES.LIST_WORKER.COLUMN.NAME} LIKE ?`;
-            PARAMS.push(`%${search}%`);
+            if (based_on == "Name") {
+                QUERY += ` AND LW.${TABLES.LIST_WORKER.COLUMN.NAME} LIKE ?`;
+                PARAMS.push(`%${search}%`);
+            } else if (based_on == "Worker Id") {
+                QUERY += ` AND LW.${TABLES.LIST_WORKER.COLUMN.ID} LIKE ?`;
+                PARAMS.push(`%${search}%`);
+            }
         }
 
         QUERY += ` ORDER BY LW.${TABLES.LIST_WORKER.COLUMN.NAME} LIMIT ? OFFSET ?`;
