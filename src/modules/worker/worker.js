@@ -46,15 +46,23 @@ class Worker {
         }
     }
 
-    delete = async (worker_id) => {
+    delete = async (worker_id, includeData) => {
         const CONNECTION = await SAT.getConnection()
         const QUERY = [
-            `DELETE FROM ${TABLES.LIST_WORKER.TABLE} WHERE ${TABLES.LIST_WORKER.COLUMN.ID} = ?`
+            `DELETE FROM ${TABLES.LIST_WORKER.TABLE} WHERE ${TABLES.LIST_WORKER.COLUMN.ID} = ?`,
+            `DELETE FROM ${TABLES.WORKER_CHECKIN.TABLE} WHERE ${TABLES.WORKER_CHECKIN.COLUMN.WORKER_ID} = ?`,
+            `DELETE FROM ${TABLES.WORKER_CHECKOUT.TABLE} WHERE ${TABLES.WORKER_CHECKOUT.COLUMN.WORKER_ID} = ?`,
         ]
-        const PARAMS = [[worker_id]]
+        let PARAMS = [[worker_id]]
 
         try {
-            await CONNECTION.query(QUERY[0], PARAMS[0])
+            if (includeData) {
+                for (let i = 0; i < QUERY.length; i++) {
+                    await CONNECTION.query(QUERY[i], PARAMS[0])
+                }
+            } else {
+                await CONNECTION.query(QUERY[0], PARAMS[0])
+            }
         } catch (error) {
             throw error
         } finally {

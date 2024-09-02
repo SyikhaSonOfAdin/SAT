@@ -3,11 +3,12 @@ const ENDPOINTS = {
         CHECKIN: '/checkin/:user_id/:project_id',
         CHECKOUT: '/checkout/:user_id/:project_id',
         SUMMARY: {
+            ATTENDANCE_PERFORMANCE: '/summary/performance',
             BYDATE: '/summary/bydate/:user_id/:project_id',
             BYDATE_DEPARTMENT: '/summary/bydatedepartment/:user_id/:project_id',
             BYDATE_SUB_DEPARTMENT: '/summary/bydatesubdepartment/:user_id/:project_id',
             DEPARTMENT: '/summary/department/:department_id/:company_id',
-            NUMBER_OF: '/summary/dashboard/numbers/:company_id/:project_id',            
+            NUMBER_OF: '/summary/dashboard/numbers/:company_id/:project_id',
         },
         DEPARTMENTS: {
             BYCOMPANYID: '/departments/:company_id',
@@ -17,13 +18,19 @@ const ENDPOINTS = {
             GETID: '/workers/getid/:project_id/:company_id',
             UNREGISTERED_WORKERS: '/workers/getunregisteredworkers/:project_id/:company_id',
         },
+        ONE_GATE: {
+            PROGRESS: {
+                DAT: '/upload/progress/dat',
+                EXCEL: '/upload/progress/excel',
+            }
+        },
         PROJECTS: {
             BY_COMPAYID: '/projects/:company_id/:password'
         }
     },
     POST: {
         COMPANY: {
-            ADD: '/company/add',   
+            ADD: '/company/add',
             EDIT: '/company/edit/:company_id/:pass_id',
             DELETE: '/company/delete/:company_id/:pass_id',
             LOGIN: '/company/login',
@@ -38,7 +45,7 @@ const ENDPOINTS = {
             ADD: '/users/add/:company_id/:pass_id',
             EDIT: '/users/edit/:company_id/:pass_id',
             DELETE: '/users/delete/:company_id/:pass_id',
-        },                     
+        },
         ONE_GATE: {
             UPLOAD: {
                 DAT: '/upload/file/dat',
@@ -67,4 +74,4 @@ const ENDPOINTS = {
     }
 }
 
-module.exports = ENDPOINTS ;
+module.exports = ENDPOINTS;

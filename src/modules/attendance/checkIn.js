@@ -33,6 +33,31 @@ class CheckIn {
         }
     }
 
+    attendancePerformance = async (month) => {
+        const CONNECTION = await SAT.getConnection()
+        const QUERY = `SELECT 
+DATE_FORMAT(WI.DATE, '%d') AS DATE,
+    COUNT(*) AS CHECKIN
+FROM 
+    worker_checkin AS WI 
+WHERE 
+    MONTH(WI.DATE) = ? AND YEAR(WI.DATE) = 2024
+GROUP BY WI.DATE
+ORDER BY WI.DATE
+`
+        const PARAMS = [[month]]
+
+        try {
+            const result = await CONNECTION.query(QUERY, PARAMS[0])
+            return result
+        } catch (error) {
+            throw error
+        } finally {
+            CONNECTION.release()
+        }
+
+    }
+
     bulkAddWC = async (CONNECTION, data) => {
         if (data.length === 0) return;
         const QUERY = [

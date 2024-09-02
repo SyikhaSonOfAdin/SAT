@@ -9,10 +9,10 @@ const worker = new Worker();
 
 
 router.post(ENDPOINTS.POST.WORKER.DELETE,  async (req, res) => {
-    const { worker_id } = req.body
+    const { worker_id, includeData } = req.body
 
     try {
-        await worker.delete(worker_id)
+        await worker.delete(worker_id, includeData)
         res.status(200).json({
             status: 'success',
         })
