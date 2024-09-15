@@ -35,11 +35,7 @@ router.post(ENDPOINTS.POST.ONE_GATE.UPLOAD.DAT, storage.dat.array('files'), asyn
 
     console.time('Execution Time Dat Bulk'); // Start timing the execution
 
-    try {
-
-        res.status(200).json({
-            status: 'upload success, processing',
-        });
+    try {        
         
         CONNECTION = await SAT.getConnection();
         await CONNECTION.beginTransaction();
@@ -128,13 +124,11 @@ router.post(ENDPOINTS.POST.ONE_GATE.UPLOAD.DAT, storage.dat.array('files'), asyn
             await checkOut.bulkAddWC(CONNECTION, insertCheckOut);
         }
         console.timeEnd('Execution insert data');
-
-        console.time('Execution Cleanup data');
-        await Promise.all([checkIn.cleanUp(CONNECTION), checkOut.cleanUp(CONNECTION)]);
-        console.timeEnd('Execution Cleanup data');
-        
-        // Commit transaksi
         await CONNECTION.commit();        
+
+        res.status(200).json({
+            status: 'upload success',
+        });
 
     } catch (error) {
         if (CONNECTION) {

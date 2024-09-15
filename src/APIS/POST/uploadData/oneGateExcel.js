@@ -35,41 +35,102 @@ router.post(ENDPOINTS.POST.ONE_GATE.UPLOAD.EXCEL, storage.excel.single('file'), 
     console.time('Request Execution Time');
 
     try {
-        res.status(200).json({
-            status: 'upload success, processing',
-        });
-
+        CONNECTION = await SAT.getConnection();
+        await CONNECTION.beginTransaction();
+        
         const RAW = await excel.getData(`${storage.nameFile}`);
         const DATA = excel.attendenceData(RAW);
         const time = "15:00:00";
         const [hours, minutes, seconds] = time.split(":").map(Number);
         const targetSeconds = (hours * 60 * 60) + (minutes * 60) + seconds;
 
-        CONNECTION = await SAT.getConnection();
-        await CONNECTION.beginTransaction();
-
+        const batchInsertData = [];
+        
+        console.time('Execution Time get shift');
         for (let i = 0; i < DATA.length; i++) {
-            const [h, m, s] = DATA[i]["TIME"].split(":").map(Number);
+            const { WORKER_ID, DATE, TIME } = DATA[i];
+            const [h, m, s] = TIME.split(":").map(Number);
             const recordSeconds = (h * 60 * 60) + (m * 60) + s;
-
-            if (recordSeconds < targetSeconds) {
-                if (await checkOut.isNightShiftWC(CONNECTION, DATA[i]["WORKER_ID"])) {
-                    await checkOut.addWC(CONNECTION, DATA[i]["WORKER_ID"], DATA[i]["DATE"], DATA[i]["TIME"]);
+            
+            const isNightShift = await checkOut.isNightShiftWC(CONNECTION, WORKER_ID);
+            
+            // Simpan data ke batch
+            batchInsertData.push({
+                worker_id: WORKER_ID,
+                date: DATE,
+                time: TIME,
+                is_night_shift: isNightShift,
+                record_seconds: recordSeconds,
+                target_seconds: targetSeconds,
+            });
+        }
+        console.timeEnd('Execution Time get shift');        
+        
+        // Mengelompokkan data berdasarkan worker_id dan date
+        const groupedData = batchInsertData.reduce((acc, data) => {
+            const key = `${data.worker_id}-${data.date}`;
+            if (!acc[key]) {
+                acc[key] = { checkIn: null, checkOut: null };
+            }
+            
+            // Memilih check-in paling awal dan check-out paling akhir
+            if (data.record_seconds < data.target_seconds) {
+                if (data.is_night_shift) {
+                    if (!acc[key].checkOut || data.record_seconds > acc[key].checkOut.record_seconds) {
+                        acc[key].checkOut = data;
+                    }
                 } else {
-                    await checkIn.addWC(CONNECTION, DATA[i]["WORKER_ID"], DATA[i]["DATE"], DATA[i]["TIME"]);
+                    if (!acc[key].checkIn || data.record_seconds < acc[key].checkIn.record_seconds) {
+                        acc[key].checkIn = data;
+                    }
                 }
             } else {
-                if (await checkOut.isNightShiftWC(CONNECTION, DATA[i]["WORKER_ID"])) {
-                    await checkIn.addWC(CONNECTION, DATA[i]["WORKER_ID"], DATA[i]["DATE"], DATA[i]["TIME"]);
+                if (data.is_night_shift) {
+                    if (!acc[key].checkIn || data.record_seconds < acc[key].checkIn.record_seconds) {
+                        acc[key].checkIn = data;
+                    }
                 } else {
-                    await checkOut.addWC(CONNECTION, DATA[i]["WORKER_ID"], DATA[i]["DATE"], DATA[i]["TIME"]);
+                    if (!acc[key].checkOut || data.record_seconds > acc[key].checkOut.record_seconds) {
+                        acc[key].checkOut = data;
+                    }
                 }
             }
+            
+            return acc;
+        }, {});
+        
+        const insertCheckIn = [];
+        const insertCheckOut = [];
+        
+        Object.values(groupedData).forEach(({ checkIn, checkOut }) => {
+            if (checkIn) {
+                insertCheckIn.push([checkIn.worker_id, checkIn.date, checkIn.time, checkIn.is_night_shift]);
+            }
+            if (checkOut) {
+                insertCheckOut.push([checkOut.worker_id, checkOut.date, checkOut.time, checkOut.is_night_shift]);
+            }
+        });
+        
+        console.time('Execution insert data');
+        // Bulk insert untuk check-in dan check-out
+        if (insertCheckIn.length > 0) {
+            await checkIn.bulkAddWC(CONNECTION, insertCheckIn);
         }
+        if (insertCheckOut.length > 0) {
+            await checkOut.bulkAddWC(CONNECTION, insertCheckOut);
+        }
+        console.timeEnd('Execution insert data');
 
-        await checkIn.cleanUp(CONNECTION);
-        await checkOut.cleanUp(CONNECTION);
+        // console.time('Execution Cleanup data');
+        // await Promise.all([checkIn.cleanUp(CONNECTION), checkOut.cleanUp(CONNECTION)]);
+        // console.timeEnd('Execution Cleanup data');
+        
+        // Commit transaksi
         await CONNECTION.commit();
+
+        res.status(200).json({
+            status: 'upload success',
+        });
 
     } catch (error) {
         await CONNECTION.rollback();
