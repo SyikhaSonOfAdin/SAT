@@ -6,7 +6,7 @@ const ARRAY_PATH = require('./src/.conf/path-conf');
 const app = express();
 const port = 3000;
 const corsOptions = {
-    origin: 'https://sat.syikha.com',
+    origin: 'sat.syikha.com',
     optionsSuccessStatus: 200
 }
 app.use(cors(corsOptions));
