@@ -5,8 +5,11 @@ const ARRAY_PATH = require('./src/.conf/path-conf');
 
 const app = express();
 const port = 3000;
-
-app.use(cors());
+const corsOptions = {
+    origin: "*" || 'https://sat.syikha.com',
+    optionsSuccessStatus: 200
+}
+app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '')));
 

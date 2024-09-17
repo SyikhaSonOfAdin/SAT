@@ -29,7 +29,7 @@ class Users {
                     cName: isExist[0][0]["COMPANY_NAME"], //Company Name
                     projId: security.encrypt(isExist[0][0]["PROJECT_ID"].toString()), //Project Id
                     projName: isExist[0][0]["PROJECT_NAME"], //Project Name
-                    version: "2.3.5"
+                    version: "2.4.5"
                 }
             } else {
                 return {

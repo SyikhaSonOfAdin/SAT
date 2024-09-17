@@ -2,6 +2,9 @@ const ENDPOINTS = {
     GET: {
         CHECKIN: '/checkin/:user_id/:project_id',
         CHECKOUT: '/checkout/:user_id/:project_id',
+        DOWNLOAD: {
+            BYDATE: '/download/:project_id'
+        },
         SUMMARY: {
             ATTENDANCE_PERFORMANCE: '/summary/performance',
             BYDATE: '/summary/bydate/:user_id/:project_id',

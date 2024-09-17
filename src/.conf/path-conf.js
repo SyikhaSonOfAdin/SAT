@@ -42,6 +42,9 @@ const PATH_CONF = {
         CHECKOUT: {
             BYDATE: require('../APIS/GET/checkout/checkOut')
         },
+        DOWNLOAD: {
+            BYDATE: require('../APIS/GET/download/byDate')
+        },
         SUMMARY: {
             ATTENDANCE_PERFORMANCE: require('../APIS/GET/summary/getAttendancePerformance'),
             BYDATE: require('../APIS/GET/summary/getByDate'),
@@ -93,6 +96,8 @@ const ARRAY_PATH = {
     GET: [
         PATH_CONF.GET.CHECKIN.BYDATE,
         PATH_CONF.GET.CHECKOUT.BYDATE,
+
+        PATH_CONF.GET.DOWNLOAD.BYDATE,
 
         PATH_CONF.GET.SUMMARY.ATTENDANCE_PERFORMANCE,
         PATH_CONF.GET.SUMMARY.BYDATE,

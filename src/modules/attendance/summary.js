@@ -67,6 +67,27 @@ ORDER BY
         }
     };
 
+    downloadData = async (projectId, dateStart, dateEnd) => {
+        const CONNECTION = await SAT.getConnection()
+        const QUERY = `SELECT COALESCE(wi.DATE, wo.DATE) AS DATE, lw.NAME AS WORKER, cd.NAME AS DEPARTMENT, wi.TIME AS CHECKIN, wo.TIME AS CHECKOUT
+FROM list_worker AS lw 
+JOIN company_departments AS cd ON lw.DEPARTMENT_ID = cd.ID
+LEFT JOIN worker_checkin AS wi ON lw.ID = wi.WORKER_ID
+LEFT JOIN worker_checkout AS wo ON lw.ID = wo.WORKER_ID
+WHERE lw.PROJECT_ID = ? AND wi.DATE BETWEEN ? AND ?
+GROUP BY lw.ID ORDER BY wi.DATE, lw.NAME
+`
+        const PARAMS = [[projectId, dateStart, dateEnd]]
+
+        try {
+            const [data] = await CONNECTION.query(QUERY, PARAMS[0])
+            return data
+        } catch (error) {
+            throw error
+        } finally {
+            CONNECTION.release()
+        }
+    }
 
     getByDateandDepartment = async (date, departments_id) => {
         const CONNECTION = await SAT.getConnection();
