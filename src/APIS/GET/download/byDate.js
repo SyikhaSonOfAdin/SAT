@@ -24,7 +24,7 @@ router.get(ENDPOINTS.GET.DOWNLOAD.BYDATE, async (req, res) => {
 
         worksheet.addRow(headers);
 
-        DATA.forEach((items) => {
+        await DATA.forEach((items) => {
             worksheet.addRow([items.DATE, items.WORKER, items.DEPARTMENT, items.CHECKIN, items.CHECKOUT]);
         });
 

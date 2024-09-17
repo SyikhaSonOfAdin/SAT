@@ -69,15 +69,31 @@ ORDER BY
 
     downloadData = async (projectId, dateStart, dateEnd) => {
         const CONNECTION = await SAT.getConnection()
-        const QUERY = `SELECT COALESCE(wi.DATE, wo.DATE) AS DATE, lw.NAME AS WORKER, cd.NAME AS DEPARTMENT, wi.TIME AS CHECKIN, wo.TIME AS CHECKOUT
-FROM list_worker AS lw 
-JOIN company_departments AS cd ON lw.DEPARTMENT_ID = cd.ID
-LEFT JOIN worker_checkin AS wi ON lw.ID = wi.WORKER_ID
-LEFT JOIN worker_checkout AS wo ON lw.ID = wo.WORKER_ID
-WHERE lw.PROJECT_ID = ? AND wi.DATE BETWEEN ? AND ?
-GROUP BY lw.ID ORDER BY wi.DATE, lw.NAME
-`
-        const PARAMS = [[projectId, dateStart, dateEnd]]
+        const QUERY = `WITH RECURSIVE date_range AS (
+    SELECT ? AS DATE
+    UNION ALL
+    SELECT DATE + INTERVAL 1 DAY
+    FROM date_range
+    WHERE DATE < ?
+)
+SELECT 
+    lw.ID, 
+    DATE_FORMAT(dr.DATE, '%Y-%m-%d') AS DATE, 
+    lw.NAME AS WORKER, 
+    cd.NAME AS DEPARTMENT,
+    COALESCE(wi_checkin.TIME, '-') AS CHECKIN, 
+    COALESCE(wi_checkout.TIME, '-') AS CHECKOUT 
+FROM 
+    date_range AS dr
+CROSS JOIN 
+    list_worker AS lw
+JOIN company_departments AS cd ON lw.DEPARTMENT_ID = cd.ID   
+LEFT JOIN 
+    worker_checkin AS wi_checkin ON lw.ID = wi_checkin.WORKER_ID AND wi_checkin.DATE = dr.DATE
+LEFT JOIN  worker_checkout AS wi_checkout ON lw.ID = wi_checkout.WORKER_ID AND wi_checkout.DATE = dr.DATE WHERE lw.PROJECT_ID = ? ORDER BY lw.NAME, dr.DATE;
+
+                    `
+        const PARAMS = [[dateStart, dateEnd, projectId]]
 
         try {
             const [data] = await CONNECTION.query(QUERY, PARAMS[0])
