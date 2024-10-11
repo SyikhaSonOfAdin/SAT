@@ -20,12 +20,12 @@ router.get(ENDPOINTS.GET.DOWNLOAD.BYDATE, async (req, res) => {
         const workbook = new exceljs.Workbook();
         const worksheet = workbook.addWorksheet('Data');
 
-        const headers = ['Date', 'Worker Name', 'Department', 'CheckIn', 'CheckOut'];
+        const headers = ['Date', 'Worker Name', 'Department', 'Sub Department', 'CheckIn', 'CheckOut', 'Shift'];
 
         worksheet.addRow(headers);
 
         await DATA.forEach((items) => {
-            worksheet.addRow([items.DATE, items.WORKER, items.DEPARTMENT, items.CHECKIN, items.CHECKOUT]);
+            worksheet.addRow([items.DATE, items.WORKER, items.DEPARTMENT, items.SUB_DEPARTMENT, items.CHECKIN, items.CHECKOUT, items.SHIFT]);
         });
 
 

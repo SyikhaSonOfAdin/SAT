@@ -81,13 +81,16 @@ SELECT
     DATE_FORMAT(dr.DATE, '%Y-%m-%d') AS DATE, 
     lw.NAME AS WORKER, 
     cd.NAME AS DEPARTMENT,
+    lsd.NAME AS SUB_DEPARTMENT,
     COALESCE(wi_checkin.TIME, '-') AS CHECKIN, 
-    COALESCE(wi_checkout.TIME, '-') AS CHECKOUT 
+    COALESCE(wi_checkout.TIME, '-') AS CHECKOUT,
+    CASE WHEN lw.SHIFT = 1 THEN 'Night' ELSE 'Day' END AS SHIFT
 FROM 
     date_range AS dr
 CROSS JOIN 
     list_worker AS lw
 JOIN company_departments AS cd ON lw.DEPARTMENT_ID = cd.ID   
+LEFT JOIN list_sub_department AS lsd ON lw.SUB_DEPARTMENT_ID = lsd.ID
 LEFT JOIN 
     worker_checkin AS wi_checkin ON lw.ID = wi_checkin.WORKER_ID AND wi_checkin.DATE = dr.DATE
 LEFT JOIN  worker_checkout AS wi_checkout ON lw.ID = wi_checkout.WORKER_ID AND wi_checkout.DATE = dr.DATE WHERE lw.PROJECT_ID = ? ORDER BY lw.NAME, dr.DATE;
