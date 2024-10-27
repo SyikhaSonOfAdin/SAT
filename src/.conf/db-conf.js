@@ -1,15 +1,15 @@
 const mysql = require('mysql2/promise');
 
 class Access {
-    #pool;
+  #pool;
 
   constructor(database) {
     this.#pool = mysql.createPool({
       connectionLimit: 25,
       queueLimit: 20,
-      host: 'localhost',     
-      user: 'syih2943_admin',      
-      password: 'syikhaakmal19',
+      host: process.env.HOST,
+      user: process.env.USER,
+      password: process.env.PASSWORD,
       database: database,
     });
   }
@@ -19,7 +19,7 @@ class Access {
   }
 }
 
-const SAT = new Access('syih2943_attendance_tracker')
+const SAT = new Access(process.env.DATABASE)
 
 module.exports = SAT
 
