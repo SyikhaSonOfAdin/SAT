@@ -7,7 +7,7 @@ const ARRAY_PATH = require('./src/.conf/path-conf');
 const app = express();
 const port = 3000;
 const corsOptions = {
-    origin: 'https://sat.kokohsemesta.com' || 'https://www.sat.kokohsemesta.com',
+    origin: ['https://sat.kokohsemesta.com', 'https://www.sat.kokohsemesta.com'],
     optionsSuccessStatus: 200
 }
 app.use(cors(corsOptions));
