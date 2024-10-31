@@ -45,8 +45,8 @@ class Users {
 
     add = async (company_id, project_id, username, email, password, level) => {
         const CONNECTION = await SAT.getConnection();
-        const QUERY = [`INSERT INTO ${TABLES.USER.TABLE} (${TABLES.USER.COLUMN.COMPANY_ID}, ${TABLES.USER.COLUMN.PROJECT_ID}, ${TABLES.USER.COLUMN.USERNAME}, 
-            ${TABLES.USER.COLUMN.EMAIL}, ${TABLES.USER.COLUMN.PASSWORD}, ${TABLES.USER.COLUMN.LEVEL}) VALUES (?, ?, ?, ?, ?, ?)`];
+        const QUERY = [`INSERT INTO ${TABLES.USER.TABLE} (${TABLES.USER.COLUMN.COMPANY_ID}, ${TABLES.USER.COLUMN.PROJECT_ID}, ${TABLES.USER.COLUMN.USERNAME}, ${TABLES.USER.COLUMN.SINCE}, 
+            ${TABLES.USER.COLUMN.EMAIL}, ${TABLES.USER.COLUMN.PASSWORD}, ${TABLES.USER.COLUMN.LEVEL}) VALUES (?, ?, ?, NOW(), ?, ?, ?)`];
 
         const PARAMS = [[company_id, project_id, username, email, password, level]]
 

@@ -7,8 +7,8 @@ class Project {
 
     add = async (company_id, name, user_id) => {
         const CONNECTION = await SAT.getConnection()
-        const QUERY = [`INSERT INTO ${TABLES.COMPANY_PROJECTS.TABLE} (${TABLES.COMPANY_PROJECTS.COLUMN.COMPANY_ID}, 
-            ${TABLES.COMPANY_PROJECTS.COLUMN.NAME}, ${TABLES.COMPANY_PROJECTS.COLUMN.INPUT_BY}) VALUES (?, ?, ?)`]
+        const QUERY = [`INSERT INTO ${TABLES.COMPANY_PROJECTS.TABLE} (${TABLES.COMPANY_PROJECTS.COLUMN.COMPANY_ID}, ${TABLES.COMPANY_PROJECTS.COLUMN.INPUT_DATE}, 
+            ${TABLES.COMPANY_PROJECTS.COLUMN.NAME}, ${TABLES.COMPANY_PROJECTS.COLUMN.INPUT_BY}) VALUES (?, NOW(), ?, ?)`]
         const PARAMS = [[company_id, name, user_id]]
 
         try {
