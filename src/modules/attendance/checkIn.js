@@ -34,7 +34,7 @@ class CheckIn {
 
     attendancePerformance = async (month) => {
         const CONNECTION = await SAT.getConnection()
-        const QUERY = `SELECT DATE_FORMAT(WI.DATE, '%d') AS DATE, COUNT(*) AS CHECKIN FROM worker_checkin AS WI WHERE MONTH(WI.DATE) = ? AND YEAR(WI.DATE) = 2024 GROUP BY WI.DATE ORDER BY WI.DATE`
+        const QUERY = `SELECT DATE_FORMAT(WI.DATE, '%d') AS DATE, COUNT(*) AS CHECKIN FROM worker_checkin AS WI WHERE MONTH(WI.DATE) = ? AND YEAR(WI.DATE) = YEAR(CURDATE()) GROUP BY WI.DATE ORDER BY WI.DATE`
         const PARAMS = [[month]]
 
         try {
